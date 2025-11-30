@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AdPlacement } from "@/components/AdPlacement";
@@ -24,6 +25,11 @@ import { useToast } from "@/hooks/use-toast";
 const JobDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
+
+  // Scroll to top on mount (especially for mobile)
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", slug],
@@ -138,6 +144,11 @@ const JobDetail = () => {
       />
       <JobStructuredData job={job} url={currentUrl} />
       <Navbar />
+
+      {/* Mobile Ad Placement - Top of Job Details */}
+      <div className="lg:hidden container mx-auto px-4 pt-4">
+        <AdPlacement type="horizontal_banner" />
+      </div>
 
       <div className="bg-muted/30 py-12">
         <div className="container mx-auto px-4">
