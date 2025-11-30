@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
@@ -37,6 +38,7 @@ const App: React.FC = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/admin" element={<AdminAuth />} />
             <Route path="/" element={<Index />} />
