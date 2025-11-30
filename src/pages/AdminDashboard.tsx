@@ -3,7 +3,17 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, LogOut, PlusCircle, Settings, BarChart } from "lucide-react";
+import { Briefcase, LogOut, PlusCircle, Settings, BarChart, Pencil, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +22,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
+  const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check authentication
@@ -51,6 +62,20 @@ const AdminDashboard = () => {
     enabled: !!user,
   });
 
+  const { data: jobs, refetch: refetchJobs } = useQuery({
+    queryKey: ["admin-jobs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*, category:job_categories(name), province:provinces(name)")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -64,6 +89,34 @@ const AdminDashboard = () => {
         title: "Signed out",
         description: "You have been signed out successfully",
       });
+    }
+  };
+
+  const handleDeleteJob = async () => {
+    if (!deleteJobId) return;
+
+    try {
+      const { error } = await supabase
+        .from("jobs")
+        .delete()
+        .eq("id", deleteJobId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Job deleted successfully",
+      });
+
+      refetchJobs();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteJobId(null);
     }
   };
 
@@ -142,7 +195,7 @@ const AdminDashboard = () => {
               </TabsList>
 
               <TabsContent value="jobs" className="space-y-4 pt-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mb-4">
                   <p className="text-muted-foreground">
                     Manage job postings and listings
                   </p>
@@ -153,9 +206,81 @@ const AdminDashboard = () => {
                     </Button>
                   </Link>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Job management interface coming soon. You can post jobs through the backend.
-                </p>
+                
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left p-4 font-medium">Job Title</th>
+                          <th className="text-left p-4 font-medium">Company</th>
+                          <th className="text-left p-4 font-medium">Location</th>
+                          <th className="text-left p-4 font-medium">Type</th>
+                          <th className="text-left p-4 font-medium">Status</th>
+                          <th className="text-left p-4 font-medium">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {jobs?.map((job) => (
+                          <tr key={job.id} className="border-t">
+                            <td className="p-4">
+                              <div className="font-medium">{job.title}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {job.category?.name || "Uncategorized"}
+                              </div>
+                            </td>
+                            <td className="p-4">{job.company_name}</td>
+                            <td className="p-4">
+                              <div>{job.location}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {job.province?.name}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <span className="text-sm capitalize">
+                                {job.job_type.replace("_", " ")}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  job.is_active
+                                    ? "bg-success/10 text-success"
+                                    : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {job.is_active ? "Active" : "Inactive"}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => navigate(`/admin/jobs/edit/${job.id}`)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setDeleteJobId(job.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {(!jobs || jobs.length === 0) && (
+                    <div className="p-8 text-center text-muted-foreground">
+                      No jobs found. Create your first job posting!
+                    </div>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="applications" className="pt-4">
@@ -200,6 +325,24 @@ const AdminDashboard = () => {
           </Button>
         </div>
       </div>
+
+      <AlertDialog open={!!deleteJobId} onOpenChange={() => setDeleteJobId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this job posting
+              and all associated applications.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteJob} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
