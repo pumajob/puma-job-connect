@@ -26,6 +26,7 @@ import EditJob from "./pages/EditJob";
 import ApplyJob from "./pages/ApplyJob";
 import Unsubscribe from "./pages/Unsubscribe";
 import Dashboard from "./pages/Dashboard";
+import ReferralDashboard from "./pages/ReferralDashboard";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import NotFound from "./pages/NotFound";
@@ -57,6 +58,7 @@ const App: React.FC = () => {
             <Route path="/salary-checker" element={<SalaryChecker />} />
             <Route path="/interview-practice" element={<InterviewPractice />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/referrals" element={<ReferralDashboard />} />
             <Route path="/news" element={<News />} />
             <Route path="/news/:slug" element={<NewsDetail />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
