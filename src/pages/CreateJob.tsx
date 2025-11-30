@@ -28,6 +28,7 @@ const CreateJob = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRewritingDescription, setIsRewritingDescription] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -96,6 +97,44 @@ const CreateJob = () => {
       // Validate form data
       const validatedData = jobSchema.parse(formData);
 
+      // Rewrite description with AI
+      let finalDescription = validatedData.description;
+      if (validatedData.description) {
+        setIsRewritingDescription(true);
+        try {
+          const { data: rewriteData, error: rewriteError } = await supabase.functions.invoke(
+            'rewrite-job-description',
+            {
+              body: { description: validatedData.description }
+            }
+          );
+
+          if (rewriteError) {
+            console.error('AI rewrite error:', rewriteError);
+            toast({
+              title: "AI Enhancement Failed",
+              description: "Using original description. " + (rewriteError.message || "AI service unavailable"),
+              variant: "destructive",
+            });
+          } else if (rewriteData?.rewrittenDescription) {
+            finalDescription = rewriteData.rewrittenDescription;
+            toast({
+              title: "Description Enhanced",
+              description: "AI has improved your job description",
+            });
+          }
+        } catch (aiError) {
+          console.error('AI processing error:', aiError);
+          toast({
+            title: "AI Enhancement Failed", 
+            description: "Using original description",
+            variant: "destructive",
+          });
+        } finally {
+          setIsRewritingDescription(false);
+        }
+      }
+
       // Generate slug from title
       const slug = validatedData.title
         .toLowerCase()
@@ -107,7 +146,7 @@ const CreateJob = () => {
         title: validatedData.title,
         slug: `${slug}-${Date.now()}`,
         company_name: validatedData.company_name,
-        description: validatedData.description,
+        description: finalDescription,
         location: validatedData.location,
         job_type: formData.job_type as "full_time" | "part_time" | "contract" | "internship" | "temporary",
         category_id: formData.category_id || null,
@@ -338,8 +377,8 @@ const CreateJob = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Creating..." : "Post Job"}
+                <Button type="submit" disabled={isSubmitting || isRewritingDescription}>
+                  {isRewritingDescription ? "Enhancing with AI..." : isSubmitting ? "Creating..." : "Post Job"}
                 </Button>
                 <Button
                   type="button"
