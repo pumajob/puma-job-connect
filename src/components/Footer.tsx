@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <footer className="bg-muted/30 border-t border-border mt-auto">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <Briefcase className="h-6 w-6 text-primary" />
@@ -43,14 +43,16 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4 text-foreground">Company</h3>
+            <h3 className="font-semibold mb-4 text-foreground">Popular Provinces</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-              <li><Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link to="/provinces/gauteng" className="hover:text-primary transition-colors">Gauteng Jobs</Link></li>
+              <li><Link to="/provinces/kwazulu-natal" className="hover:text-primary transition-colors">KZN Jobs</Link></li>
+              <li><Link to="/provinces/western-cape" className="hover:text-primary transition-colors">Western Cape Jobs</Link></li>
+              <li><Link to="/provinces/limpopo" className="hover:text-primary transition-colors">Limpopo Jobs</Link></li>
+              <li><Link to="/provinces/free-state" className="hover:text-primary transition-colors">Free State Jobs</Link></li>
             </ul>
           </div>
+
         </div>
 
         <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">

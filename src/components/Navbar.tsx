@@ -27,6 +27,12 @@ export const Navbar = () => {
             >
               Categories
             </Link>
+            <Link 
+              to="/provinces" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Provinces
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
