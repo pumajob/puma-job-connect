@@ -2,9 +2,13 @@ import { useEffect } from "react";
 
 interface JobStructuredDataProps {
   job: {
+    id?: string;
     title: string;
     company_name: string;
+    company_logo?: string | null;
     description: string;
+    requirements?: string | null;
+    responsibilities?: string | null;
     location: string;
     salary_range?: string;
     job_type: string;
@@ -20,28 +24,66 @@ export const JobStructuredData = ({ job, url }: JobStructuredDataProps) => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
     
-    const structuredData = {
+    // Map job_type to Google Jobs employmentType format
+    const employmentTypeMap: Record<string, string> = {
+      "full_time": "FULL_TIME",
+      "part_time": "PART_TIME",
+      "contract": "CONTRACTOR",
+      "internship": "INTERN",
+      "temporary": "TEMPORARY"
+    };
+
+    // Build full description
+    let fullDescription = job.description;
+    if (job.requirements) {
+      fullDescription += `\n\nRequirements:\n${job.requirements}`;
+    }
+    if (job.responsibilities) {
+      fullDescription += `\n\nResponsibilities:\n${job.responsibilities}`;
+    }
+
+    const structuredData: any = {
       "@context": "https://schema.org/",
       "@type": "JobPosting",
       "title": job.title,
-      "description": job.description.substring(0, 500),
-      "datePosted": job.created_at,
-      "validThrough": job.application_deadline || undefined,
-      "employmentType": job.job_type.toUpperCase().replace("_", "_"),
+      "description": fullDescription,
+      "identifier": {
+        "@type": "PropertyValue",
+        "name": "South Africa Jobs",
+        "value": job.id
+      },
+      "datePosted": job.created_at.split('T')[0], // ISO 8601 date format
+      "validThrough": job.application_deadline 
+        ? new Date(job.application_deadline).toISOString()
+        : undefined,
+      "employmentType": employmentTypeMap[job.job_type] || "FULL_TIME",
       "hiringOrganization": {
         "@type": "Organization",
-        "name": job.company_name
+        "name": job.company_name,
+        "sameAs": url,
+        "logo": job.company_logo || undefined
       },
       "jobLocation": {
         "@type": "Place",
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": job.location,
           "addressLocality": job.location,
-          "addressRegion": job.province?.name,
+          "addressRegion": job.province?.name || "South Africa",
           "addressCountry": "ZA"
         }
       },
-      "baseSalary": job.salary_range ? {
+      "applicantLocationRequirements": {
+        "@type": "Country",
+        "name": "ZA"
+      },
+      "jobLocationType": "TELECOMMUTE",
+      "url": url
+    };
+
+    // Add salary information if available
+    if (job.salary_range) {
+      structuredData.baseSalary = {
         "@type": "MonetaryAmount",
         "currency": "ZAR",
         "value": {
@@ -49,9 +91,15 @@ export const JobStructuredData = ({ job, url }: JobStructuredDataProps) => {
           "value": job.salary_range,
           "unitText": "YEAR"
         }
-      } : undefined,
-      "url": url
-    };
+      };
+    }
+
+    // Remove undefined fields
+    Object.keys(structuredData).forEach(key => {
+      if (structuredData[key] === undefined) {
+        delete structuredData[key];
+      }
+    });
 
     script.text = JSON.stringify(structuredData);
     document.head.appendChild(script);
