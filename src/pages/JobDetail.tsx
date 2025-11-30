@@ -236,20 +236,11 @@ const JobDetail = () => {
                   </div>
 
                   <div className="pt-6 border-t border-border">
-                    {job.external_url ? (
-                      <Button asChild className="w-full" size="lg">
-                        <a href={job.external_url} target="_blank" rel="noopener noreferrer">
-                          Apply Now
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </a>
+                    <Link to={`/apply/${job.slug}`}>
+                      <Button className="w-full" size="lg">
+                        {job.external_url ? "Apply Now" : "Apply with AI-Optimized CV"}
                       </Button>
-                    ) : (
-                      <Link to={`/apply/${job.slug}`}>
-                        <Button className="w-full" size="lg">
-                          Apply with AI-Optimized CV
-                        </Button>
-                      </Link>
-                    )}
+                    </Link>
                   </div>
 
                   <div className="pt-6 border-t border-border">
