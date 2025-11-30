@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AdPlacement } from "@/components/AdPlacement";
 import { RelatedJobs } from "@/components/RelatedJobs";
+import { JobAlertSubscription } from "@/components/JobAlertSubscription";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { JobStructuredData } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
@@ -326,6 +327,13 @@ const JobDetail = () => {
               provinceId={job.province_id}
               jobType={job.job_type}
             />
+          </div>
+
+          {/* Job Alert Subscription */}
+          <div className="bg-muted/30 py-16">
+            <div className="max-w-2xl mx-auto px-4">
+              <JobAlertSubscription />
+            </div>
           </div>
         </div>
       </div>

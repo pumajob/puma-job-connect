@@ -103,6 +103,54 @@ export type Database = {
           },
         ]
       }
+      job_alerts: {
+        Row: {
+          categories: string[] | null
+          created_at: string | null
+          email: string
+          id: string
+          is_active: boolean | null
+          job_types: string[] | null
+          keywords: string | null
+          last_sent_at: string | null
+          provinces: string[] | null
+          unsubscribe_token: string
+          updated_at: string | null
+          verification_token: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          categories?: string[] | null
+          created_at?: string | null
+          email: string
+          id?: string
+          is_active?: boolean | null
+          job_types?: string[] | null
+          keywords?: string | null
+          last_sent_at?: string | null
+          provinces?: string[] | null
+          unsubscribe_token?: string
+          updated_at?: string | null
+          verification_token?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          categories?: string[] | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          job_types?: string[] | null
+          keywords?: string | null
+          last_sent_at?: string | null
+          provinces?: string[] | null
+          unsubscribe_token?: string
+          updated_at?: string | null
+          verification_token?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       job_categories: {
         Row: {
           created_at: string | null
