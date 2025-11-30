@@ -154,6 +154,9 @@ const Companies = () => {
           </div>
         </section>
 
+        {/* In-Article Ad */}
+        <AdPlacement type="in_article" className="container mx-auto px-4 py-8" />
+
         <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
       </main>
 

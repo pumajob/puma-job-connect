@@ -169,6 +169,9 @@ export default function NewsDetail() {
           </article>
         </main>
 
+        {/* Multiplex Ad */}
+        <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
+
         <Footer />
       </div>
     </>

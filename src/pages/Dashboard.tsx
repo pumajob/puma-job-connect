@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
 import { TrendingUp, Calendar, Target, Award } from "lucide-react";
+import { AdPlacement } from "@/components/AdPlacement";
 
 const Dashboard = () => {
   const [email, setEmail] = useState("");
@@ -63,6 +64,12 @@ const Dashboard = () => {
       />
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
         <Navbar />
+
+        {/* Top Display Ad */}
+        <div className="bg-muted/20 py-4">
+          <AdPlacement type="display" className="container mx-auto px-4" />
+        </div>
+
         <main className="flex-1 container mx-auto px-4 py-12">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
@@ -227,8 +234,15 @@ const Dashboard = () => {
                 )}
               </>
             )}
+
+            {/* In-Article Ad */}
+            <AdPlacement type="in_article" className="mt-8" />
           </div>
         </main>
+
+        {/* Multiplex Ad */}
+        <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
+
         <Footer />
       </div>
     </>

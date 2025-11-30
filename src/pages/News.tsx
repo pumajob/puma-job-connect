@@ -124,8 +124,14 @@ export default function News() {
                 </CardContent>
               </Card>
             )}
+
+            {/* In-Article Ad */}
+            <AdPlacement type="in_article" className="mt-8" />
           </div>
         </main>
+
+        {/* Multiplex Ad */}
+        <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
 
         <Footer />
       </div>
