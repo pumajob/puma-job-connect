@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase } from "lucide-react";
@@ -22,6 +23,12 @@ const Categories = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="Browse Job Categories | PumaJob South Africa"
+        description="Explore job opportunities by category in South Africa. Find government jobs, IT & technology, healthcare, education, finance, engineering and more across all provinces."
+        keywords={["job categories South Africa", "government jobs", "IT jobs", "healthcare jobs", "education jobs", "finance careers", "engineering positions"]}
+        canonicalUrl="https://pumajob.co.za/categories"
+      />
       <Navbar />
 
       <div className="bg-muted/30 py-12 flex-1">
@@ -45,7 +52,7 @@ const Categories = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {categories?.map((category) => (
-                  <Link key={category.id} to={`/jobs?category=${category.id}`}>
+                  <Link key={category.id} to={`/categories/${category.slug}`}>
                     <Card className="group hover:shadow-medium transition-all hover:-translate-y-1">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
