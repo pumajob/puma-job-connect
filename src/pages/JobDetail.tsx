@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AdPlacement } from "@/components/AdPlacement";
+import { RelatedJobs } from "@/components/RelatedJobs";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { JobStructuredData } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
@@ -315,6 +316,16 @@ const JobDetail = () => {
                 <AdPlacement type="sticky_sidebar" />
               </div>
             </div>
+          </div>
+
+          {/* Related Jobs Section */}
+          <div className="container mx-auto px-4 py-12">
+            <RelatedJobs
+              currentJobId={job.id}
+              categoryId={job.category_id}
+              provinceId={job.province_id}
+              jobType={job.job_type}
+            />
           </div>
         </div>
       </div>
