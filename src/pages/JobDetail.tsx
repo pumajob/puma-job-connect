@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AdPlacement } from "@/components/AdPlacement";
@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   MapPin,
   Building2,
   Briefcase,
@@ -18,6 +25,8 @@ import {
   Share2,
   Mail,
   ExternalLink,
+  Bell,
+  Facebook,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 const JobDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   // Scroll to top on mount (especially for mobile)
   useEffect(() => {
@@ -71,6 +81,9 @@ const JobDetail = () => {
     switch (platform) {
       case "whatsapp":
         shareUrl = `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`;
+        break;
+      case "facebook":
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         break;
       case "email":
         shareUrl = `mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`;
@@ -285,13 +298,20 @@ const JobDetail = () => {
 
                   <div className="pt-6 border-t border-border">
                     <h3 className="font-semibold mb-4">Share this job</h3>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => shareJob("whatsapp")}
                       >
                         WhatsApp
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => shareJob("facebook")}
+                      >
+                        <Facebook className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="outline"
@@ -308,6 +328,16 @@ const JobDetail = () => {
                         <Share2 className="h-4 w-4" />
                       </Button>
                     </div>
+                    
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full mt-3"
+                      onClick={() => setIsAlertModalOpen(true)}
+                    >
+                      <Bell className="h-4 w-4 mr-2" />
+                      Subscribe to Alerts
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -329,14 +359,21 @@ const JobDetail = () => {
             />
           </div>
 
-          {/* Job Alert Subscription */}
-          <div className="bg-muted/30 py-16">
-            <div className="max-w-2xl mx-auto px-4">
-              <JobAlertSubscription />
-            </div>
-          </div>
         </div>
       </div>
+
+      {/* Job Alert Subscription Modal */}
+      <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Subscribe to Job Alerts</DialogTitle>
+            <DialogDescription className="sr-only">
+              Get notified about jobs matching your preferences
+            </DialogDescription>
+          </DialogHeader>
+          <JobAlertSubscription />
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
