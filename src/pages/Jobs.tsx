@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { JobCard } from "@/components/JobCard";
 import { AdPlacement } from "@/components/AdPlacement";
+import { InFeedAd } from "@/components/InFeedAd";
+import { SEOHead } from "@/components/seo/SEOHead";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -81,8 +83,35 @@ const Jobs = () => {
     setSearchParams(params);
   };
 
+  // Generate SEO data
+  const pageTitle = searchTerm 
+    ? `${searchTerm} Jobs in South Africa`
+    : selectedProvince && provinces?.find(p => p.id === selectedProvince)
+    ? `Jobs in ${provinces.find(p => p.id === selectedProvince)?.name}`
+    : "Browse All Jobs in South Africa";
+    
+  const pageDescription = `Find ${jobs?.length || "thousands of"} job opportunities ${
+    selectedProvince ? `in ${provinces?.find(p => p.id === selectedProvince)?.name}` : "across South Africa"
+  }. ${searchTerm ? `Search results for: ${searchTerm}` : "Apply today!"}`;
+
+  const keywords = [
+    "South Africa jobs",
+    "job search",
+    "career opportunities",
+    searchTerm,
+    selectedProvince && provinces?.find(p => p.id === selectedProvince)?.name,
+    "employment",
+    "vacancies"
+  ].filter(Boolean) as string[];
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead 
+        title={pageTitle}
+        description={pageDescription}
+        keywords={keywords}
+        canonicalUrl={`${window.location.origin}/jobs${window.location.search}`}
+      />
       <Navbar />
 
       <div className="bg-muted/30 py-12">
@@ -155,12 +184,15 @@ const Jobs = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {jobs?.map((job, index) => (
-                  <div key={job.id}>
-                    <JobCard job={job} />
-                    {(index === 3 || index === 8 || index === 15) && (
-                      <AdPlacement type="in_article" className="col-span-full" />
+                  <>
+                    <JobCard key={job.id} job={job} />
+                    {/* Insert in-feed ad after every 5 jobs */}
+                    {(index + 1) % 5 === 0 && index !== jobs.length - 1 && (
+                      <div className="col-span-1 md:col-span-2 lg:col-span-3" key={`ad-${index}`}>
+                        <InFeedAd className="my-4" />
+                      </div>
                     )}
-                  </div>
+                  </>
                 ))}
               </div>
 

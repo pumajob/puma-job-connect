@@ -8,6 +8,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { JobCard } from "@/components/JobCard";
 import { AdPlacement } from "@/components/AdPlacement";
+import { SEOHead } from "@/components/seo/SEOHead";
+import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -56,6 +58,26 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead 
+        title="Find Jobs in South Africa"
+        description="Discover thousands of job opportunities across all provinces in South Africa. Search for full-time, part-time, contract, internship, and temporary positions from top employers."
+        keywords={[
+          "South Africa jobs",
+          "job search",
+          "employment opportunities",
+          "careers South Africa",
+          "job listings",
+          "vacancies",
+          "government jobs",
+          "private sector jobs"
+        ]}
+        canonicalUrl={window.location.origin}
+      />
+      <WebsiteStructuredData 
+        name="South Africa Jobs"
+        description="Find your dream job in South Africa - Browse thousands of opportunities across all provinces"
+        url={window.location.origin}
+      />
       <Navbar />
       
       {/* Hero Section */}
@@ -119,8 +141,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Display Ad */}
-      <AdPlacement type="display" className="container mx-auto px-4" />
+      {/* Display Ad - Above the fold */}
+      <div className="bg-muted/20 py-4">
+        <AdPlacement type="display" className="container mx-auto px-4" />
+      </div>
 
       {/* Featured Jobs */}
       <section className="py-16 bg-background">

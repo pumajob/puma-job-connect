@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 interface AdPlacementProps {
-  type: "in_article" | "display" | "multiplex";
+  type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
   className?: string;
 }
 
@@ -39,6 +39,18 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
           style: { display: "block" } as React.CSSProperties,
           "data-ad-format": "autorelaxed",
           "data-ad-slot": "6159596154",
+        };
+      case "sticky_sidebar":
+        return {
+          style: { display: "block", minHeight: "600px" } as React.CSSProperties,
+          "data-ad-format": "auto",
+          "data-ad-slot": "3154909234",
+          "data-full-width-responsive": "false",
+        };
+      case "horizontal_banner":
+        return {
+          style: { display: "inline-block", width: "728px", height: "90px" } as React.CSSProperties,
+          "data-ad-slot": "3154909234",
         };
     }
   };
