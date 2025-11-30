@@ -127,158 +127,154 @@ export const JobAlertSubscription = () => {
   };
 
   return (
-    <Card className="border-primary/20 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Bell className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <CardTitle className="text-2xl">Get Job Alerts</CardTitle>
-            <CardDescription>
-              Receive daily emails with jobs matching your preferences
-            </CardDescription>
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 pb-6 border-b">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <Bell className="w-6 h-6 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-semibold">Get Job Alerts</h2>
+          <p className="text-muted-foreground">
+            Receive daily emails with jobs matching your preferences
+          </p>
+        </div>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Email Input */}
+        <div className="space-y-2">
+          <Label htmlFor="email" className="flex items-center gap-2">
+            <Mail className="w-4 h-4" />
+            Email Address *
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            maxLength={255}
+            className="focus-visible:ring-primary"
+          />
+        </div>
+
+        {/* Keywords Input */}
+        <div className="space-y-2">
+          <Label htmlFor="keywords">
+            Keywords (optional)
+            <span className="text-muted-foreground text-sm ml-2">
+              Comma-separated
+            </span>
+          </Label>
+          <Input
+            id="keywords"
+            type="text"
+            placeholder="e.g., software, manager, remote"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            maxLength={500}
+          />
+        </div>
+
+        {/* Categories */}
+        <div className="space-y-3">
+          <Label>Categories (optional)</Label>
+          <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2 border rounded-lg">
+            {categories?.map((category) => (
+              <div key={category.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={selectedCategories.includes(category.id)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedCategories([...selectedCategories, category.id]);
+                    } else {
+                      setSelectedCategories(selectedCategories.filter(id => id !== category.id));
+                    }
+                  }}
+                />
+                <label
+                  htmlFor={`category-${category.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {category.name}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
-      </CardHeader>
-      
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Input */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              maxLength={255}
-              className="focus-visible:ring-primary"
-            />
+
+        {/* Provinces */}
+        <div className="space-y-3">
+          <Label>Provinces (optional)</Label>
+          <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2 border rounded-lg">
+            {provinces?.map((province) => (
+              <div key={province.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`province-${province.id}`}
+                  checked={selectedProvinces.includes(province.id)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedProvinces([...selectedProvinces, province.id]);
+                    } else {
+                      setSelectedProvinces(selectedProvinces.filter(id => id !== province.id));
+                    }
+                  }}
+                />
+                <label
+                  htmlFor={`province-${province.id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {province.name}
+                </label>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Keywords Input */}
-          <div className="space-y-2">
-            <Label htmlFor="keywords">
-              Keywords (optional)
-              <span className="text-muted-foreground text-sm ml-2">
-                Comma-separated
-              </span>
-            </Label>
-            <Input
-              id="keywords"
-              type="text"
-              placeholder="e.g., software, manager, remote"
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              maxLength={500}
-            />
+        {/* Job Types */}
+        <div className="space-y-3">
+          <Label>Job Types (optional)</Label>
+          <div className="grid grid-cols-2 gap-3">
+            {jobTypes.map((type) => (
+              <div key={type.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`type-${type.value}`}
+                  checked={selectedJobTypes.includes(type.value)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedJobTypes([...selectedJobTypes, type.value]);
+                    } else {
+                      setSelectedJobTypes(selectedJobTypes.filter(t => t !== type.value));
+                    }
+                  }}
+                />
+                <label
+                  htmlFor={`type-${type.value}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {type.label}
+                </label>
+              </div>
+            ))}
           </div>
+        </div>
 
-          {/* Categories */}
-          <div className="space-y-3">
-            <Label>Categories (optional)</Label>
-            <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2 border rounded-lg">
-              {categories?.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category.id}`}
-                    checked={selectedCategories.includes(category.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedCategories([...selectedCategories, category.id]);
-                      } else {
-                        setSelectedCategories(selectedCategories.filter(id => id !== category.id));
-                      }
-                    }}
-                  />
-                  <label
-                    htmlFor={`category-${category.id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {category.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
+        <Button 
+          type="submit" 
+          className="w-full" 
+          size="lg"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Subscribing..." : "Subscribe to Job Alerts"}
+        </Button>
 
-          {/* Provinces */}
-          <div className="space-y-3">
-            <Label>Provinces (optional)</Label>
-            <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2 border rounded-lg">
-              {provinces?.map((province) => (
-                <div key={province.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`province-${province.id}`}
-                    checked={selectedProvinces.includes(province.id)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedProvinces([...selectedProvinces, province.id]);
-                      } else {
-                        setSelectedProvinces(selectedProvinces.filter(id => id !== province.id));
-                      }
-                    }}
-                  />
-                  <label
-                    htmlFor={`province-${province.id}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {province.name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Job Types */}
-          <div className="space-y-3">
-            <Label>Job Types (optional)</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {jobTypes.map((type) => (
-                <div key={type.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`type-${type.value}`}
-                    checked={selectedJobTypes.includes(type.value)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setSelectedJobTypes([...selectedJobTypes, type.value]);
-                      } else {
-                        setSelectedJobTypes(selectedJobTypes.filter(t => t !== type.value));
-                      }
-                    }}
-                  />
-                  <label
-                    htmlFor={`type-${type.value}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    {type.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <Button 
-            type="submit" 
-            className="w-full" 
-            size="lg"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Subscribing..." : "Subscribe to Job Alerts"}
-          </Button>
-
-          <p className="text-xs text-muted-foreground text-center">
-            You'll receive a daily digest of jobs matching your preferences. 
-            Unsubscribe anytime via the link in your emails.
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+        <p className="text-xs text-muted-foreground text-center">
+          You'll receive a daily digest of jobs matching your preferences. 
+          Unsubscribe anytime via the link in your emails.
+        </p>
+      </form>
+    </div>
   );
 };
