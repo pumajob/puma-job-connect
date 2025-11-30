@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, LogOut, PlusCircle, Settings, BarChart, Pencil, Trash2 } from "lucide-react";
+import { VisitorStats } from "@/components/VisitorStats";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -146,6 +147,11 @@ const AdminDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Visitor Stats */}
+        <div className="mb-8">
+          <VisitorStats />
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
