@@ -119,14 +119,6 @@ const JobDetail = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardContent className="p-8">
-                  {job.image_url && (
-                    <img
-                      src={job.image_url}
-                      alt={job.title}
-                      className="w-full h-64 object-cover rounded-lg mb-6"
-                    />
-                  )}
-
                   <div className="flex items-start gap-4 mb-6">
                     {job.company_logo && (
                       <img
