@@ -28,16 +28,10 @@ export const Navbar = () => {
               Categories
             </Link>
             <Link 
-              to="/provinces" 
+              to="/companies" 
               className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
-              Provinces
-            </Link>
-            <Link 
-              to="/qualifications" 
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Qualifications
+              Companies
             </Link>
           </div>
 

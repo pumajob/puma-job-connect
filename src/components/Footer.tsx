@@ -38,6 +38,7 @@ export const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/jobs" className="hover:text-primary transition-colors">Browse Jobs</Link></li>
               <li><Link to="/categories" className="hover:text-primary transition-colors">Job Categories</Link></li>
+              <li><Link to="/companies" className="hover:text-primary transition-colors">Companies Hiring</Link></li>
               <li><Link to="/provinces" className="hover:text-primary transition-colors">Jobs by Province</Link></li>
               <li><Link to="/qualifications" className="hover:text-primary transition-colors">Jobs by Qualification</Link></li>
             </ul>
