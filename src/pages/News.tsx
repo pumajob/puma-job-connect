@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Calendar, Newspaper } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { AdPlacement } from "@/components/AdPlacement";
 
 export default function News() {
   const { data: newsArticles, isLoading } = useQuery({
@@ -54,6 +55,8 @@ export default function News() {
                 Stay informed with the latest updates affecting the South African job market and economy
               </p>
             </div>
+
+            <AdPlacement type="display" className="mb-8" />
 
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft, Share2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { AdPlacement } from "@/components/AdPlacement";
+import { InFeedAd } from "@/components/InFeedAd";
 
 export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -105,6 +107,8 @@ export default function NewsDetail() {
                   Back to News
                 </Link>
               </Button>
+
+              <AdPlacement type="display" />
               
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -141,11 +145,17 @@ export default function NewsDetail() {
             )}
 
             <div className="prose prose-lg dark:prose-invert max-w-none">
-              {article.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="mb-4 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
+              {article.content.split('\n\n').map((paragraph, index, array) => {
+                const midPoint = Math.floor(array.length / 2);
+                return (
+                  <div key={index}>
+                    <p className="mb-4 leading-relaxed">
+                      {paragraph}
+                    </p>
+                    {index === midPoint && <InFeedAd className="my-8" />}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-12 pt-8 border-t">
