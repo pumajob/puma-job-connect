@@ -1,3 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://pumajob.co.za/sitemap.xml
+
+# Allow specific important pages
+Allow: /jobs
+Allow: /categories
+Allow: /provinces
+Allow: /qualifications
+Allow: /companies
+Allow: /salary-checker
+
+# Allow all bots to crawl all pages
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +25,5 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
