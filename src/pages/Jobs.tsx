@@ -157,7 +157,9 @@ const Jobs = () => {
                 {jobs?.map((job, index) => (
                   <div key={job.id}>
                     <JobCard job={job} />
-                    {index === 5 && <AdPlacement type="in_article" />}
+                    {(index === 3 || index === 8 || index === 15) && (
+                      <AdPlacement type="in_article" className="col-span-full" />
+                    )}
                   </div>
                 ))}
               </div>
