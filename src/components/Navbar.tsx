@@ -33,6 +33,12 @@ export const Navbar = () => {
             >
               Provinces
             </Link>
+            <Link 
+              to="/qualifications" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Qualifications
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">

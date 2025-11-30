@@ -12,6 +12,8 @@ import Categories from "./pages/Categories";
 import CategoryDetail from "./pages/CategoryDetail";
 import Provinces from "./pages/Provinces";
 import ProvinceJobs from "./pages/ProvinceJobs";
+import Qualifications from "./pages/Qualifications";
+import QualificationJobs from "./pages/QualificationJobs";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateJob from "./pages/CreateJob";
@@ -38,6 +40,8 @@ const App: React.FC = () => {
             <Route path="/categories/:slug" element={<CategoryDetail />} />
             <Route path="/provinces" element={<Provinces />} />
             <Route path="/provinces/:slug" element={<ProvinceJobs />} />
+            <Route path="/qualifications" element={<Qualifications />} />
+            <Route path="/qualifications/:slug" element={<QualificationJobs />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
