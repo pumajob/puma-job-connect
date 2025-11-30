@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Lightbulb, Mail, ArrowRight } from 'lucide-react';
 
 interface Question {
   question: string;
@@ -24,7 +24,9 @@ interface Evaluation {
 
 export const InterviewHelper = () => {
   const { toast } = useToast();
-  const [step, setStep] = useState<'setup' | 'answering' | 'results'>('setup');
+  const [step, setStep] = useState<'email' | 'setup' | 'answering' | 'results'>('email');
+  const [email, setEmail] = useState('');
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState('');
   const [questionCount, setQuestionCount] = useState('3');
   const [questions, setQuestions] = useState<string[]>([]);
@@ -33,6 +35,19 @@ export const InterviewHelper = () => {
   const [currentAnswer, setCurrentAnswer] = useState('');
   const [evaluation, setEvaluation] = useState<Evaluation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  const handleEmailSubmit = () => {
+    if (!email || !email.includes('@')) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid email address',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setStep('setup');
+  };
 
   const handleGenerateQuestions = async () => {
     if (!jobTitle.trim()) {
@@ -46,6 +61,20 @@ export const InterviewHelper = () => {
 
     setLoading(true);
     try {
+      // Create session record
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('interview_sessions')
+        .insert({
+          email,
+          job_title: jobTitle,
+          question_count: parseInt(questionCount)
+        })
+        .select('id')
+        .single();
+
+      if (sessionError) throw sessionError;
+      setSessionId(sessionData.id);
+
       const { data, error } = await supabase.functions.invoke('interview-helper', {
         body: {
           action: 'generate',
@@ -124,7 +153,60 @@ export const InterviewHelper = () => {
       }
 
       setEvaluation(data.evaluation);
+      
+      // Calculate average score
+      const total = data.evaluation.reduce((sum: number, e: Evaluation) => sum + e.score, 0);
+      const avgScore = parseFloat((total / data.evaluation.length).toFixed(1));
+
+      // Update session with results
+      if (sessionId) {
+        await supabase
+          .from('interview_sessions')
+          .update({
+            results: data.evaluation,
+            average_score: avgScore
+          })
+          .eq('id', sessionId);
+      }
+
       setStep('results');
+      
+      // Send results email
+      setSendingEmail(true);
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-interview-results', {
+          body: {
+            email,
+            jobTitle,
+            sessionId,
+            evaluation: data.evaluation,
+            averageScore: avgScore
+          }
+        });
+
+        if (emailError) {
+          console.error("Error sending email:", emailError);
+          toast({
+            title: 'Partial Success',
+            description: "Results saved, but couldn't send email. Please check your inbox later.",
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Success',
+            description: "Results sent to your email! Check your inbox.",
+          });
+        }
+      } catch (emailErr) {
+        console.error("Email sending error:", emailErr);
+        toast({
+          title: 'Partial Success',
+          description: "Results saved, but email delivery failed.",
+          variant: 'destructive',
+        });
+      } finally {
+        setSendingEmail(false);
+      }
       
       toast({
         title: 'Success',
@@ -143,7 +225,9 @@ export const InterviewHelper = () => {
   };
 
   const handleReset = () => {
-    setStep('setup');
+    setStep('email');
+    setEmail('');
+    setSessionId(null);
     setJobTitle('');
     setQuestionCount('3');
     setQuestions([]);
@@ -161,10 +245,45 @@ export const InterviewHelper = () => {
 
   return (
     <div className="space-y-6">
+      {step === 'email' && (
+        <Card className="border-primary/20">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+            <CardTitle className="text-2xl">Get Your Results via Email</CardTitle>
+            <CardDescription className="text-base">
+              Enter your email to receive detailed interview feedback and related job opportunities
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="your.email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleEmailSubmit()}
+              />
+            </div>
+
+            <Button 
+              onClick={handleEmailSubmit}
+              className="w-full"
+              size="lg"
+            >
+              Continue <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {step === 'setup' && (
         <Card className="border-primary/20">
           <CardHeader>
-            <CardTitle className="text-2xl">Interview Practice Helper</CardTitle>
+            <CardTitle className="text-2xl">Interview Practice Setup</CardTitle>
             <CardDescription>
               Practice your interview skills with AI-generated questions and get personalized feedback
             </CardDescription>
@@ -255,11 +374,22 @@ export const InterviewHelper = () => {
       {step === 'results' && (
         <div className="space-y-6">
           <Card className="border-primary/20 bg-primary/5">
-            <CardHeader>
+            <CardHeader className="text-center">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-2" />
               <CardTitle className="text-2xl">Your Interview Results</CardTitle>
               <CardDescription className="text-lg">
                 Average Score: <span className="text-2xl font-bold text-primary">{getAverageScore()}/10</span>
               </CardDescription>
+              {sendingEmail ? (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mt-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Sending results to {email}...</span>
+                </div>
+              ) : (
+                <p className="text-sm text-green-600 font-medium mt-2">
+                  ✓ Results sent to {email}
+                </p>
+              )}
             </CardHeader>
           </Card>
 

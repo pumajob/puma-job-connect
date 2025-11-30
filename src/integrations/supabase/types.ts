@@ -103,6 +103,39 @@ export type Database = {
           },
         ]
       }
+      interview_sessions: {
+        Row: {
+          average_score: number | null
+          created_at: string
+          email: string
+          id: string
+          job_title: string
+          question_count: number
+          results: Json | null
+          updated_at: string
+        }
+        Insert: {
+          average_score?: number | null
+          created_at?: string
+          email: string
+          id?: string
+          job_title: string
+          question_count: number
+          results?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          average_score?: number | null
+          created_at?: string
+          email?: string
+          id?: string
+          job_title?: string
+          question_count?: number
+          results?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       job_alerts: {
         Row: {
           categories: string[] | null
