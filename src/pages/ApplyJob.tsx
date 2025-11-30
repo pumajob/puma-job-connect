@@ -11,6 +11,7 @@ import { Upload, Sparkles, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 
 const ApplyJob = () => {
   const { slug } = useParams();
@@ -27,6 +28,15 @@ const ApplyJob = () => {
   const [applicantSurname, setApplicantSurname] = useState("");
   const [applicantEmail, setApplicantEmail] = useState("");
   const [applicantPhone, setApplicantPhone] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  // Validation schemas
+  const emailSchema = z.string().email({ message: "Invalid email address" });
+  const phoneSchema = z.string().regex(
+    /^(?:\+27|0)[0-9]{9}$/,
+    { message: "Invalid South African phone number. Use format: 0123456789 or +27123456789" }
+  );
 
   const { data: job } = useQuery({
     queryKey: ["job", slug],
@@ -78,6 +88,32 @@ const ApplyJob = () => {
     }
   };
 
+  const validateEmail = (email: string) => {
+    try {
+      emailSchema.parse(email);
+      setEmailError("");
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setEmailError(error.errors[0].message);
+      }
+      return false;
+    }
+  };
+
+  const validatePhone = (phone: string) => {
+    try {
+      phoneSchema.parse(phone);
+      setPhoneError("");
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setPhoneError(error.errors[0].message);
+      }
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -85,6 +121,14 @@ const ApplyJob = () => {
     try {
       // Handle external job applications
       if (job?.external_url) {
+        // Validate email and phone before submission
+        const isEmailValid = validateEmail(applicantEmail);
+        const isPhoneValid = validatePhone(applicantPhone);
+        
+        if (!isEmailValid || !isPhoneValid) {
+          setIsSubmitting(false);
+          return;
+        }
         const { error: applicationError } = await supabase.from("applications").insert({
           job_id: job.id,
           applicant_name: applicantName,
@@ -187,25 +231,40 @@ const ApplyJob = () => {
                         id="email"
                         type="email"
                         value={applicantEmail}
-                        onChange={(e) => setApplicantEmail(e.target.value)}
+                        onChange={(e) => {
+                          setApplicantEmail(e.target.value);
+                          if (e.target.value) validateEmail(e.target.value);
+                        }}
+                        onBlur={() => applicantEmail && validateEmail(applicantEmail)}
                         required
                         className="mt-2"
                       />
+                      {emailError && (
+                        <p className="text-sm text-destructive mt-1">{emailError}</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="phone">Cell Number *</Label>
                       <Input
                         id="phone"
                         type="tel"
+                        placeholder="0123456789 or +27123456789"
                         value={applicantPhone}
-                        onChange={(e) => setApplicantPhone(e.target.value)}
+                        onChange={(e) => {
+                          setApplicantPhone(e.target.value);
+                          if (e.target.value) validatePhone(e.target.value);
+                        }}
+                        onBlur={() => applicantPhone && validatePhone(applicantPhone)}
                         required
                         className="mt-2"
                       />
+                      {phoneError && (
+                        <p className="text-sm text-destructive mt-1">{phoneError}</p>
+                      )}
                     </div>
                     <Button 
                       type="submit" 
-                      disabled={!applicantName || !applicantSurname || !applicantEmail || !applicantPhone || isSubmitting} 
+                      disabled={!applicantName || !applicantSurname || !applicantEmail || !applicantPhone || isSubmitting || !!emailError || !!phoneError} 
                       className="w-full gap-2"
                     >
                       {isSubmitting ? "Submitting..." : "Submit & Continue to Application"}
