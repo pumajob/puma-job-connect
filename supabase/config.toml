@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.interview-helper]
 verify_jwt = false
+
+[functions.send-interview-results]
+verify_jwt = false

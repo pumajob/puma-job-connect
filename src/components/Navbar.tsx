@@ -39,6 +39,12 @@ export const Navbar = () => {
             >
               Salary Checker
             </Link>
+            <Link 
+              to="/interview-practice" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Interview Practice
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">

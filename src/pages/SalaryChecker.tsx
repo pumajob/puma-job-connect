@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
-import { InterviewHelper } from "@/components/InterviewHelper";
 
 interface SalaryResult {
   jobTitle: string;
@@ -308,11 +307,6 @@ const SalaryChecker = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* Interview Helper */}
-            <div className="mt-8">
-              <InterviewHelper />
-            </div>
 
             {/* SEO Content */}
             <Card className="mt-8">
