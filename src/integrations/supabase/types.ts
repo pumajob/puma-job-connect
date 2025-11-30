@@ -322,6 +322,33 @@ export type Database = {
         }
         Relationships: []
       }
+      salary_queries: {
+        Row: {
+          created_at: string
+          id: string
+          job_title: string
+          query_count: number
+          salary_range: string
+          skills: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_title: string
+          query_count?: number
+          salary_range: string
+          skills: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_title?: string
+          query_count?: number
+          salary_range?: string
+          skills?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

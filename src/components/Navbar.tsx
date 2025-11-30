@@ -33,6 +33,12 @@ export const Navbar = () => {
             >
               Companies
             </Link>
+            <Link 
+              to="/salary-checker" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              Salary Checker
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
