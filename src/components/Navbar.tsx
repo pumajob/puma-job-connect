@@ -45,6 +45,12 @@ export const Navbar = () => {
             >
               Interview Practice
             </Link>
+            <Link 
+              to="/dashboard" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+            >
+              My Progress
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">

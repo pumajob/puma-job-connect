@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreateJob from "./pages/CreateJob";
 import ApplyJob from "./pages/ApplyJob";
 import Unsubscribe from "./pages/Unsubscribe";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App: React.FC = () => {
             <Route path="/companies/:slug" element={<CompanyJobs />} />
             <Route path="/salary-checker" element={<SalaryChecker />} />
             <Route path="/interview-practice" element={<InterviewPractice />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
