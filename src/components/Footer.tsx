@@ -39,6 +39,7 @@ export const Footer = () => {
               <li><Link to="/jobs" className="hover:text-primary transition-colors">Browse Jobs</Link></li>
               <li><Link to="/categories" className="hover:text-primary transition-colors">Job Categories</Link></li>
               <li><Link to="/provinces" className="hover:text-primary transition-colors">Jobs by Province</Link></li>
+              <li><Link to="/qualifications" className="hover:text-primary transition-colors">Jobs by Qualification</Link></li>
             </ul>
           </div>
 
@@ -49,7 +50,16 @@ export const Footer = () => {
               <li><Link to="/provinces/kwazulu-natal" className="hover:text-primary transition-colors">KZN Jobs</Link></li>
               <li><Link to="/provinces/western-cape" className="hover:text-primary transition-colors">Western Cape Jobs</Link></li>
               <li><Link to="/provinces/limpopo" className="hover:text-primary transition-colors">Limpopo Jobs</Link></li>
-              <li><Link to="/provinces/free-state" className="hover:text-primary transition-colors">Free State Jobs</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4 text-foreground">By Qualification</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link to="/qualifications/matric-jobs" className="hover:text-primary transition-colors">Matric Jobs</Link></li>
+              <li><Link to="/qualifications/no-experience-jobs" className="hover:text-primary transition-colors">No Experience</Link></li>
+              <li><Link to="/qualifications/learnerships" className="hover:text-primary transition-colors">Learnerships</Link></li>
+              <li><Link to="/qualifications/government-jobs" className="hover:text-primary transition-colors">Government Jobs</Link></li>
             </ul>
           </div>
 
