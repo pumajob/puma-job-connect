@@ -442,6 +442,36 @@ export type Database = {
         }
         Relationships: []
       }
+      visitors: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          page_path: string
+          referrer: string | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          page_path: string
+          referrer?: string | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          page_path?: string
+          referrer?: string | null
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -450,6 +480,15 @@ export type Database = {
       check_user_role: {
         Args: { required_role: string; user_id: string }
         Returns: boolean
+      }
+      get_visitor_stats: {
+        Args: never
+        Returns: {
+          today_unique: number
+          today_visits: number
+          total_visits: number
+          unique_visitors: number
+        }[]
       }
       is_admin: { Args: { user_id: string }; Returns: boolean }
     }
