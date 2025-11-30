@@ -46,38 +46,50 @@ export type Database = {
       }
       applications: {
         Row: {
-          applicant_id: string
+          applicant_email: string | null
+          applicant_id: string | null
+          applicant_name: string | null
+          applicant_phone: string | null
+          applicant_surname: string | null
           cover_letter: string | null
           created_at: string | null
           id: string
           job_id: string
           notes: string | null
           optimized_cv_url: string | null
-          original_cv_url: string
+          original_cv_url: string | null
           status: Database["public"]["Enums"]["application_status"] | null
           updated_at: string | null
         }
         Insert: {
-          applicant_id: string
+          applicant_email?: string | null
+          applicant_id?: string | null
+          applicant_name?: string | null
+          applicant_phone?: string | null
+          applicant_surname?: string | null
           cover_letter?: string | null
           created_at?: string | null
           id?: string
           job_id: string
           notes?: string | null
           optimized_cv_url?: string | null
-          original_cv_url: string
+          original_cv_url?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           updated_at?: string | null
         }
         Update: {
-          applicant_id?: string
+          applicant_email?: string | null
+          applicant_id?: string | null
+          applicant_name?: string | null
+          applicant_phone?: string | null
+          applicant_surname?: string | null
           cover_letter?: string | null
           created_at?: string | null
           id?: string
           job_id?: string
           notes?: string | null
           optimized_cv_url?: string | null
-          original_cv_url?: string
+          original_cv_url?: string | null
           status?: Database["public"]["Enums"]["application_status"] | null
           updated_at?: string | null
         }
