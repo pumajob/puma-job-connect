@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { JobCard } from "@/components/JobCard";
 import { AdPlacement } from "@/components/AdPlacement";
+import { TrendingJobs } from "@/components/TrendingJobs";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
 import { useQuery } from "@tanstack/react-query";
@@ -184,6 +185,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Trending Jobs Section */}
+      <TrendingJobs />
 
       {/* In-Article Ad */}
       <AdPlacement type="in_article" className="container mx-auto px-4" />
