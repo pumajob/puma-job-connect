@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Briefcase } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AdPlacement } from "@/components/AdPlacement";
 
 const Categories = () => {
   const { data: categories, isLoading } = useQuery({
@@ -30,6 +31,11 @@ const Categories = () => {
         canonicalUrl="https://pumajob.co.za/categories"
       />
       <Navbar />
+
+      {/* Top Display Ad */}
+      <div className="bg-muted/20 py-4">
+        <AdPlacement type="display" className="container mx-auto px-4" />
+      </div>
 
       <div className="bg-muted/30 py-12 flex-1">
         <div className="container mx-auto px-4">
@@ -81,9 +87,17 @@ const Categories = () => {
                 ))}
               </div>
             )}
+
+            {/* In-Article Ad */}
+            <div className="mt-8">
+              <AdPlacement type="in_article" />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Multiplex Ad */}
+      <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
 
       <Footer />
     </div>

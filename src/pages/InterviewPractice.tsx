@@ -2,6 +2,7 @@ import { InterviewHelper } from "@/components/InterviewHelper";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { AdPlacement } from "@/components/AdPlacement";
 
 const InterviewPractice = () => {
   return (
@@ -14,6 +15,11 @@ const InterviewPractice = () => {
       />
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-secondary/5 to-background">
         <Navbar />
+
+        {/* Top Display Ad */}
+        <div className="bg-muted/20 py-4">
+          <AdPlacement type="display" className="container mx-auto px-4" />
+        </div>
         
         <main className="flex-1 container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
@@ -28,8 +34,14 @@ const InterviewPractice = () => {
             </div>
 
             <InterviewHelper />
+
+            {/* In-Article Ad */}
+            <AdPlacement type="in_article" className="mt-8" />
           </div>
         </main>
+
+        {/* Multiplex Ad */}
+        <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
 
         <Footer />
       </div>

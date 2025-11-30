@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { AdPlacement } from "@/components/AdPlacement";
 
 interface SalaryResult {
   jobTitle: string;
@@ -177,6 +178,11 @@ const SalaryChecker = () => {
       
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
+
+        {/* Top Display Ad */}
+        <div className="bg-muted/20 py-4">
+          <AdPlacement type="display" className="container mx-auto px-4" />
+        </div>
         
         <main className="flex-grow container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
@@ -334,8 +340,14 @@ const SalaryChecker = () => {
                 </ul>
               </CardContent>
             </Card>
+
+            {/* In-Article Ad */}
+            <AdPlacement type="in_article" className="mt-8" />
           </div>
         </main>
+
+        {/* Multiplex Ad */}
+        <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
 
         <Footer />
       </div>

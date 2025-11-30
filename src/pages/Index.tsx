@@ -188,6 +188,9 @@ const Index = () => {
       {/* In-Article Ad */}
       <AdPlacement type="in_article" className="container mx-auto px-4" />
 
+      {/* Multiplex Ad */}
+      <AdPlacement type="multiplex" className="container mx-auto px-4" />
+
       <Footer />
     </div>
   );
