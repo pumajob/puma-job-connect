@@ -21,6 +21,7 @@ import SalaryChecker from "./pages/SalaryChecker";
 import InterviewPractice from "./pages/InterviewPractice";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminReferrals from "./pages/AdminReferrals";
 import CreateJob from "./pages/CreateJob";
 import EditJob from "./pages/EditJob";
 import ApplyJob from "./pages/ApplyJob";
@@ -63,6 +64,7 @@ const App: React.FC = () => {
             <Route path="/news/:slug" element={<NewsDetail />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
             <Route path="/admin/jobs/edit/:id" element={<ProtectedRoute><EditJob /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

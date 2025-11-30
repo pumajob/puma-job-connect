@@ -193,11 +193,12 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="jobs" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="jobs">Jobs</TabsTrigger>
                 <TabsTrigger value="applications">Applications</TabsTrigger>
                 <TabsTrigger value="categories">Categories</TabsTrigger>
                 <TabsTrigger value="ads">Ads</TabsTrigger>
+                <TabsTrigger value="referrals">Referrals</TabsTrigger>
               </TabsList>
 
               <TabsContent value="jobs" className="space-y-4 pt-4">
@@ -314,6 +315,41 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground mt-4">
                   Ad management interface coming soon. Current ads are pre-configured.
                 </p>
+              </TabsContent>
+
+              <TabsContent value="referrals" className="pt-4">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-muted-foreground">
+                      Manage referral program and process rewards
+                    </p>
+                    <Link to="/admin/referrals">
+                      <Button>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Manage Referrals
+                      </Button>
+                    </Link>
+                  </div>
+                  <Card className="border-2 border-primary/20">
+                    <CardHeader>
+                      <CardTitle className="text-lg">Referral Program</CardTitle>
+                      <CardDescription>
+                        Users earn R50 airtime for every 20 successful referrals
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Visit the Referral Management page to:
+                      </p>
+                      <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground ml-4">
+                        <li>View all referrals and track validity</li>
+                        <li>Process pending reward payments</li>
+                        <li>Send airtime to users who reached milestones</li>
+                        <li>Monitor referral program statistics</li>
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
