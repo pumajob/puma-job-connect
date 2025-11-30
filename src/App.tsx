@@ -16,6 +16,7 @@ import Qualifications from "./pages/Qualifications";
 import QualificationJobs from "./pages/QualificationJobs";
 import Companies from "./pages/Companies";
 import CompanyJobs from "./pages/CompanyJobs";
+import SalaryChecker from "./pages/SalaryChecker";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateJob from "./pages/CreateJob";
@@ -46,6 +47,7 @@ const App: React.FC = () => {
             <Route path="/qualifications/:slug" element={<QualificationJobs />} />
             <Route path="/companies" element={<Companies />} />
             <Route path="/companies/:slug" element={<CompanyJobs />} />
+            <Route path="/salary-checker" element={<SalaryChecker />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />

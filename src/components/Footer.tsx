@@ -41,6 +41,7 @@ export const Footer = () => {
               <li><Link to="/companies" className="hover:text-primary transition-colors">Companies Hiring</Link></li>
               <li><Link to="/provinces" className="hover:text-primary transition-colors">Jobs by Province</Link></li>
               <li><Link to="/qualifications" className="hover:text-primary transition-colors">Jobs by Qualification</Link></li>
+              <li><Link to="/salary-checker" className="hover:text-primary transition-colors">Salary Checker</Link></li>
             </ul>
           </div>
 
