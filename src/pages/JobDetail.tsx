@@ -156,6 +156,10 @@ const JobDetail = () => {
         keywords={keywords}
         canonicalUrl={currentUrl}
         type="article"
+        publishedTime={job.created_at}
+        modifiedTime={job.updated_at}
+        author={job.company_name}
+        section="Jobs"
       />
       <JobStructuredData job={job} url={currentUrl} />
       <Navbar />
