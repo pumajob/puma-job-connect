@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/seo/SEOHead";
+import { ArticleStructuredData } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft, Share2 } from "lucide-react";
 import { format } from "date-fns";
@@ -92,9 +93,18 @@ export default function NewsDetail() {
       <SEOHead
         title={article.title}
         description={article.excerpt || ""}
+        keywords={["South Africa news", "job market", article.title.toLowerCase()]}
         ogImage={article.image_url || undefined}
         canonicalUrl={`${window.location.origin}/news/${article.slug}`}
         type="article"
+        publishedTime={article.published_at}
+        modifiedTime={article.published_at}
+        author="South Africa Jobs"
+        section="News"
+      />
+      <ArticleStructuredData
+        article={article}
+        url={`${window.location.origin}/news/${article.slug}`}
       />
 
       <div className="min-h-screen bg-background">

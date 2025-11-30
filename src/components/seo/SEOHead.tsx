@@ -7,6 +7,10 @@ interface SEOHeadProps {
   ogImage?: string;
   canonicalUrl?: string;
   type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  section?: string;
 }
 
 export const SEOHead = ({
@@ -16,6 +20,10 @@ export const SEOHead = ({
   ogImage,
   canonicalUrl,
   type = "website",
+  publishedTime,
+  modifiedTime,
+  author,
+  section,
 }: SEOHeadProps) => {
   useEffect(() => {
     // Set page title
@@ -60,6 +68,22 @@ export const SEOHead = ({
       updateMetaTag("twitter:image", ogImage, true);
     }
 
+    // Article-specific meta tags
+    if (type === "article") {
+      if (publishedTime) {
+        updateMetaTag("article:published_time", publishedTime);
+      }
+      if (modifiedTime) {
+        updateMetaTag("article:modified_time", modifiedTime);
+      }
+      if (author) {
+        updateMetaTag("article:author", author);
+      }
+      if (section) {
+        updateMetaTag("article:section", section);
+      }
+    }
+
     // Canonical URL
     if (canonicalUrl) {
       let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
@@ -76,7 +100,7 @@ export const SEOHead = ({
       // Reset title
       document.title = "South Africa Jobs";
     };
-  }, [title, description, keywords, ogImage, canonicalUrl, type]);
+  }, [title, description, keywords, ogImage, canonicalUrl, type, publishedTime, modifiedTime, author, section]);
 
   return null;
 };

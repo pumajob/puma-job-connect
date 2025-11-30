@@ -101,3 +101,60 @@ export const WebsiteStructuredData = ({ name, description, url }: WebsiteStructu
 
   return null;
 };
+
+interface ArticleStructuredDataProps {
+  article: {
+    title: string;
+    excerpt: string | null;
+    content: string;
+    image_url: string | null;
+    published_at: string;
+    slug: string;
+  };
+  url: string;
+}
+
+export const ArticleStructuredData = ({ article, url }: ArticleStructuredDataProps) => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": article.title,
+      "description": article.excerpt || article.content.substring(0, 200),
+      "image": article.image_url ? [article.image_url] : undefined,
+      "datePublished": article.published_at,
+      "dateModified": article.published_at,
+      "author": {
+        "@type": "Organization",
+        "name": "South Africa Jobs",
+        "url": window.location.origin
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "South Africa Jobs",
+        "logo": {
+          "@type": "ImageObject",
+          "url": `${window.location.origin}/favicon.ico`
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": url
+      },
+      "articleSection": "News",
+      "inLanguage": "en-ZA"
+    };
+
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [article, url]);
+
+  return null;
+};
