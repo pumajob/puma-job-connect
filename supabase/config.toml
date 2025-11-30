@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.optimize-cv]
 verify_jwt = false
+
+[functions.interview-helper]
+verify_jwt = false
