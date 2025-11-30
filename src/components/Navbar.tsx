@@ -76,26 +76,26 @@ export const Navbar = () => {
             {navLinks}
           </div>
 
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px]">
-              <div className="flex flex-col gap-4 mt-8">
-                {navLinks}
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             <Link to="/admin" className="hidden md:block">
               <Button variant="ghost" size="sm" className="gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Admin</span>
               </Button>
             </Link>
+            
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild className="md:hidden">
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px]">
+                <div className="flex flex-col gap-4 mt-8">
+                  {navLinks}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
