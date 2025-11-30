@@ -2,6 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { AdPlacement } from "@/components/AdPlacement";
+import { SEOHead } from "@/components/seo/SEOHead";
+import { JobStructuredData } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -108,8 +110,33 @@ const JobDetail = () => {
     );
   }
 
+  const currentUrl = window.location.href;
+  
+  const seoDescription = job.description.length > 160 
+    ? job.description.substring(0, 157) + "..." 
+    : job.description;
+
+  const keywords = [
+    job.title,
+    job.company_name,
+    job.location,
+    job.province?.name,
+    job.category?.name,
+    job.job_type.replace("_", " "),
+    "South Africa jobs",
+    "job opportunity"
+  ].filter(Boolean) as string[];
+
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead 
+        title={`${job.title} at ${job.company_name}`}
+        description={seoDescription}
+        keywords={keywords}
+        canonicalUrl={currentUrl}
+        type="article"
+      />
+      <JobStructuredData job={job} url={currentUrl} />
       <Navbar />
 
       <div className="bg-muted/30 py-12">
@@ -183,7 +210,7 @@ const JobDetail = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
               <Card className="sticky top-24">
                 <CardContent className="p-6 space-y-6">
                   <div>
@@ -272,7 +299,10 @@ const JobDetail = () => {
                 </CardContent>
               </Card>
 
-              <AdPlacement type="multiplex" className="mt-6" />
+              {/* Sticky Sidebar Ad */}
+              <div className="sticky top-[500px]">
+                <AdPlacement type="sticky_sidebar" />
+              </div>
             </div>
           </div>
         </div>
