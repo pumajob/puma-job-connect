@@ -9,6 +9,7 @@ import JobDetail from "./pages/JobDetail";
 import Categories from "./pages/Categories";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
+import CreateJob from "./pages/CreateJob";
 import ApplyJob from "./pages/ApplyJob";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/categories" element={<Categories />} />
           <Route path="/admin" element={<AdminAuth />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/jobs/new" element={<CreateJob />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
