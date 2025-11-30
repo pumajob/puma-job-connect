@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import Categories from "./pages/Categories";
+import CategoryDetail from "./pages/CategoryDetail";
 import AdminAuth from "./pages/AdminAuth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateJob from "./pages/CreateJob";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/jobs/:slug" element={<JobDetail />} />
           <Route path="/apply/:slug" element={<ProtectedRoute><ApplyJob /></ProtectedRoute>} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/categories/:slug" element={<CategoryDetail />} />
           <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
