@@ -26,6 +26,9 @@ const ApplyJob = () => {
   const [applicantPhone, setApplicantPhone] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  
+  // Honeypot field for spam prevention
+  const [honeypot, setHoneypot] = useState("");
 
   // Validation schemas
   const emailSchema = z.string().email({ message: "Invalid email address" });
@@ -81,6 +84,17 @@ const ApplyJob = () => {
     try {
       if (!job) return;
 
+      // Honeypot spam check - if filled, it's a bot
+      if (honeypot) {
+        toast({ 
+          title: "Error", 
+          description: "Spam detected. Please try again.", 
+          variant: "destructive" 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Validate email and phone before submission
       const isEmailValid = validateEmail(applicantEmail);
       const isPhoneValid = validatePhone(applicantPhone);
@@ -131,6 +145,20 @@ const ApplyJob = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot field - hidden from users but visible to bots */}
+                <div className="hidden" aria-hidden="true">
+                  <Label htmlFor="website">Website</Label>
+                  <Input
+                    id="website"
+                    name="website"
+                    type="text"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Name *</Label>
