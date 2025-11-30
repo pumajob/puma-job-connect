@@ -20,7 +20,7 @@ const jobSchema = z.object({
   salary_range: z.string().trim().max(100, "Salary range too long").optional(),
   requirements: z.string().trim().max(3000, "Requirements too long").optional(),
   responsibilities: z.string().trim().max(3000, "Responsibilities too long").optional(),
-  external_url: z.string().trim().url("Invalid URL").max(500, "URL too long").optional().or(z.literal("")),
+  external_url: z.string().trim().url("Invalid URL").min(1, "External Application URL is required").max(500, "URL too long"),
 });
 
 const CreateJob = () => {
@@ -326,13 +326,14 @@ const CreateJob = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="external_url">External Application URL</Label>
+                <Label htmlFor="external_url">External Application URL *</Label>
                 <Input
                   id="external_url"
                   type="url"
                   value={formData.external_url}
                   onChange={(e) => handleChange("external_url", e.target.value)}
                   placeholder="https://company.com/apply"
+                  required
                 />
               </div>
 
