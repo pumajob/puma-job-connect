@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.send-interview-results]
 verify_jwt = false
+
+[functions.generate-news]
+verify_jwt = false
