@@ -58,6 +58,13 @@ export const Navbar = () => {
       >
         My Progress
       </Link>
+      <Link 
+        to="/referrals" 
+        className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+        onClick={() => setOpen(false)}
+      >
+        Referrals
+      </Link>
     </>
   );
 

@@ -20,3 +20,9 @@ verify_jwt = false
 
 [functions.rewrite-job-description]
 verify_jwt = false
+
+[functions.track-referral]
+verify_jwt = false
+
+[functions.send-referral-notification]
+verify_jwt = false

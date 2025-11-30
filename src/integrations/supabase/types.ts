@@ -394,6 +394,93 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          created_at: string
+          id: string
+          phone_number: string | null
+          processed_at: string | null
+          referral_count: number
+          reward_amount: number
+          reward_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phone_number?: string | null
+          processed_at?: string | null
+          referral_count: number
+          reward_amount: number
+          reward_type?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phone_number?: string | null
+          processed_at?: string | null
+          referral_count?: number
+          reward_amount?: number
+          reward_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          is_valid: boolean
+          referral_code: string
+          referred_user_id: string
+          referred_user_ip: string
+          referrer_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          referral_code: string
+          referred_user_id: string
+          referred_user_ip: string
+          referrer_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          referral_code?: string
+          referred_user_id?: string
+          referred_user_ip?: string
+          referrer_user_id?: string
+        }
+        Relationships: []
+      }
       salary_queries: {
         Row: {
           created_at: string
@@ -480,6 +567,17 @@ export type Database = {
       check_user_role: {
         Args: { required_role: string; user_id: string }
         Returns: boolean
+      }
+      generate_referral_code: { Args: never; Returns: string }
+      get_referral_stats: {
+        Args: { user_uuid: string }
+        Returns: {
+          completed_rewards: number
+          pending_rewards: number
+          referrals_to_next_reward: number
+          total_referrals: number
+          valid_referrals: number
+        }[]
       }
       get_visitor_stats: {
         Args: never
