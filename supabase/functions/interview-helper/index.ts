@@ -105,9 +105,16 @@ Do not include any additional text, explanations, or formatting - just the JSON 
 
       let questions;
       try {
-        questions = JSON.parse(content);
+        // Strip markdown code blocks if present
+        let cleanContent = content.trim();
+        if (cleanContent.startsWith('```')) {
+          // Remove opening ```json or ``` and closing ```
+          cleanContent = cleanContent.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+        }
+        questions = JSON.parse(cleanContent);
       } catch (e) {
         console.error('Failed to parse questions JSON:', e);
+        console.error('Raw content:', content);
         return new Response(
           JSON.stringify({ error: 'Failed to parse questions' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -219,9 +226,16 @@ Do not include any additional text - just the JSON array.`;
 
       let evaluation;
       try {
-        evaluation = JSON.parse(content);
+        // Strip markdown code blocks if present
+        let cleanContent = content.trim();
+        if (cleanContent.startsWith('```')) {
+          // Remove opening ```json or ``` and closing ```
+          cleanContent = cleanContent.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+        }
+        evaluation = JSON.parse(cleanContent);
       } catch (e) {
         console.error('Failed to parse evaluation JSON:', e);
+        console.error('Raw content:', content);
         return new Response(
           JSON.stringify({ error: 'Failed to parse evaluation' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
