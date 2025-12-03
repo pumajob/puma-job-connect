@@ -385,6 +385,11 @@ const JobDetail = () => {
             jobType={job.job_type}
           />
         </div>
+
+        {/* Final Ad after Related Jobs */}
+        <div className="container mx-auto px-4 pb-12">
+          <AdPlacement type="horizontal_banner" lazy />
+        </div>
       </div>
 
       {/* Job Alert Subscription Modal */}
