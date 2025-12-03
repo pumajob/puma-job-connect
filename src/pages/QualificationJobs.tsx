@@ -174,10 +174,23 @@ const QualificationJobs = () => {
             ) : jobs && jobs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {jobs.map((job, index) => (
-                  <div key={job.id}>
-                    <JobCard job={job} />
-                    {(index + 1) % 6 === 0 && <InFeedAd />}
-                  </div>
+                  <>
+                    <div key={job.id}>
+                      <JobCard job={job} />
+                    </div>
+                    {/* Mobile ad after every 3 jobs */}
+                    {(index + 1) % 3 === 0 && (
+                      <div className="md:hidden col-span-1">
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                    {/* Desktop in-feed ad after every 6 jobs */}
+                    {(index + 1) % 6 === 0 && (
+                      <div className="hidden md:block col-span-full">
+                        <InFeedAd />
+                      </div>
+                    )}
+                  </>
                 ))}
               </div>
             ) : (

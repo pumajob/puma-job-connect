@@ -150,34 +150,42 @@ const Qualifications = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {qualificationsWithCounts?.map((qual) => (
-                  <Link 
-                    key={qual.slug} 
-                    to={`/qualifications/${qual.slug}`}
-                    className="group"
-                  >
-                    <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
-                      <CardHeader>
-                        <div className="flex items-center gap-2 mb-2">
-                          <GraduationCap className="h-6 w-6 text-primary" />
-                          <CardTitle className="text-2xl group-hover:text-primary transition-colors">
-                            {qual.name}
-                          </CardTitle>
-                        </div>
-                        <CardDescription className="flex items-center gap-2">
-                          <Briefcase className="h-4 w-4" />
-                          <span className="text-base">
-                            {qual.jobCount} {qual.jobCount === 1 ? 'opportunity' : 'opportunities'} available
-                          </span>
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                          {qual.description}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                {qualificationsWithCounts?.map((qual, index) => (
+                  <>
+                    <Link 
+                      key={qual.slug} 
+                      to={`/qualifications/${qual.slug}`}
+                      className="group"
+                    >
+                      <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
+                        <CardHeader>
+                          <div className="flex items-center gap-2 mb-2">
+                            <GraduationCap className="h-6 w-6 text-primary" />
+                            <CardTitle className="text-2xl group-hover:text-primary transition-colors">
+                              {qual.name}
+                            </CardTitle>
+                          </div>
+                          <CardDescription className="flex items-center gap-2">
+                            <Briefcase className="h-4 w-4" />
+                            <span className="text-base">
+                              {qual.jobCount} {qual.jobCount === 1 ? 'opportunity' : 'opportunities'} available
+                            </span>
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            {qual.description}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    {/* Mobile ad after every 3 qualifications */}
+                    {(index + 1) % 3 === 0 && (
+                      <div className="md:hidden col-span-1">
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                  </>
                 ))}
               </div>
             )}
