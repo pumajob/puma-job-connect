@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, CheckCircle, XCircle, Lightbulb, Mail, ArrowRight, Eye } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Lightbulb, Mail, ArrowRight, Eye, Play, X } from 'lucide-react';
 import { AdPlacement } from '@/components/AdPlacement';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Question {
   question: string;
@@ -40,6 +41,9 @@ export const InterviewHelper = () => {
   const [currentResultIndex, setCurrentResultIndex] = useState(0);
   const [adCountdown, setAdCountdown] = useState(5);
   const [canProceed, setCanProceed] = useState(false);
+  const [showRewardedAd, setShowRewardedAd] = useState(false);
+  const [rewardedAdCountdown, setRewardedAdCountdown] = useState(3);
+  const [rewardedAdComplete, setRewardedAdComplete] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Scroll to top and reset ad state when showing ad pages
@@ -48,6 +52,7 @@ export const InterviewHelper = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setAdCountdown(5);
       setCanProceed(false);
+      setRewardedAdComplete(false);
       
       const timer = setInterval(() => {
         setAdCountdown((prev) => {
@@ -63,6 +68,37 @@ export const InterviewHelper = () => {
       return () => clearInterval(timer);
     }
   }, [step, currentQuestionIndex, currentResultIndex]);
+
+  // Rewarded ad countdown
+  useEffect(() => {
+    if (showRewardedAd) {
+      setRewardedAdCountdown(3);
+      setRewardedAdComplete(false);
+      
+      const timer = setInterval(() => {
+        setRewardedAdCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setRewardedAdComplete(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [showRewardedAd]);
+
+  const handleWatchRewardedAd = () => {
+    setShowRewardedAd(true);
+  };
+
+  const handleClaimReward = () => {
+    setShowRewardedAd(false);
+    setCanProceed(true);
+    setAdCountdown(0);
+  };
 
   const handleEmailSubmit = () => {
     if (!email || !email.includes('@')) {
@@ -381,9 +417,9 @@ export const InterviewHelper = () => {
               
               <AdPlacement type="in_article" className="my-0" />
 
-              <div className="text-center">
+              <div className="text-center space-y-4">
                 {!canProceed ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <p className="text-muted-foreground">
                       Your question will be ready in <span className="font-bold text-primary text-xl">{adCountdown}</span> seconds
                     </p>
@@ -392,6 +428,22 @@ export const InterviewHelper = () => {
                         className="bg-primary h-2 rounded-full transition-all duration-1000"
                         style={{ width: `${((5 - adCountdown) / 5) * 100}%` }}
                       />
+                    </div>
+                    
+                    {/* Skip timer option */}
+                    <div className="pt-2 border-t border-border/50">
+                      <Button 
+                        onClick={handleWatchRewardedAd} 
+                        variant="outline" 
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <Play className="h-4 w-4" />
+                        Skip Timer - Watch Short Ad
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Watch a 3-second ad to skip the timer
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -481,9 +533,9 @@ export const InterviewHelper = () => {
               
               <AdPlacement type="in_article" className="my-0" />
 
-              <div className="text-center">
+              <div className="text-center space-y-4">
                 {!canProceed ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <p className="text-muted-foreground">
                       Your feedback will be ready in <span className="font-bold text-primary text-xl">{adCountdown}</span> seconds
                     </p>
@@ -492,6 +544,22 @@ export const InterviewHelper = () => {
                         className="bg-primary h-2 rounded-full transition-all duration-1000"
                         style={{ width: `${((5 - adCountdown) / 5) * 100}%` }}
                       />
+                    </div>
+                    
+                    {/* Skip timer option */}
+                    <div className="pt-2 border-t border-border/50">
+                      <Button 
+                        onClick={handleWatchRewardedAd} 
+                        variant="outline" 
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <Play className="h-4 w-4" />
+                        Skip Timer - Watch Short Ad
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Watch a 3-second ad to skip the timer
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -589,6 +657,45 @@ export const InterviewHelper = () => {
           </div>
         </div>
       )}
+
+      {/* Rewarded Ad Modal */}
+      <Dialog open={showRewardedAd} onOpenChange={setShowRewardedAd}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Play className="h-5 w-5 text-primary" />
+              Watch Ad to Skip Timer
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-muted/30 rounded-lg p-4 min-h-[300px]">
+              <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
+              <AdPlacement type="display" className="my-0" />
+            </div>
+            
+            <div className="text-center">
+              {!rewardedAdComplete ? (
+                <div className="space-y-3">
+                  <p className="text-muted-foreground">
+                    Please wait <span className="font-bold text-primary text-xl">{rewardedAdCountdown}</span> seconds
+                  </p>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${((3 - rewardedAdCountdown) / 3) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Button onClick={handleClaimReward} size="lg" className="w-full">
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Continue to Content
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
