@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
@@ -10,6 +11,16 @@ export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementP
   const adRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(!lazy);
   const [adLoaded, setAdLoaded] = useState(false);
+
+  const getMinHeight = () => {
+    switch (type) {
+      case "in_article": return 280;
+      case "display": return 250;
+      case "multiplex": return 300;
+      case "sticky_sidebar": return 600;
+      case "horizontal_banner": return 100;
+    }
+  };
 
   // Lazy loading with Intersection Observer
   useEffect(() => {
@@ -91,9 +102,18 @@ export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementP
   };
 
   const config = getAdConfig();
+  const minHeight = getMinHeight();
 
   return (
     <div ref={adRef} className={`my-8 ${className}`}>
+      {!isVisible && (
+        <div className="relative overflow-hidden rounded-lg bg-muted/50" style={{ minHeight }}>
+          <Skeleton className="absolute inset-0 w-full h-full" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xs text-muted-foreground/50">Ad</span>
+          </div>
+        </div>
+      )}
       {isVisible && (
         <ins
           className="adsbygoogle"
