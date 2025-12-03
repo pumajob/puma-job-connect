@@ -31,7 +31,11 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
         // Lower threshold for mobile (200px instead of 250px)
         if (width >= 200) {
           adPushedRef.current = true;
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+          } catch {
+            // Ignore push errors from Auto Ads conflicts
+          }
         }
       } catch (err) {
         // Silently handle AdSense errors
