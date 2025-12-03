@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
@@ -8,37 +8,53 @@ interface AdPlacementProps {
 export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
   const adContainerRef = useRef<HTMLDivElement>(null);
   const adPushedRef = useRef(false);
+  const uniqueId = useId();
 
   useEffect(() => {
-    if (adPushedRef.current) return;
-
+    // Reset on mount to handle strict mode double-render
+    adPushedRef.current = false;
+    
     const loadAd = () => {
       if (adPushedRef.current) return;
       
       try {
-        if (window.adsbygoogle && adContainerRef.current) {
-          const width = adContainerRef.current.offsetWidth;
-          if (width >= 250) {
-            adPushedRef.current = true;
-            (window.adsbygoogle = window.adsbygoogle || []).push({});
-          }
+        const container = adContainerRef.current;
+        if (!container) return;
+        
+        const insElement = container.querySelector('ins.adsbygoogle');
+        if (!insElement) return;
+        
+        // Check if this specific ins element already has an ad
+        if (insElement.getAttribute('data-ad-status')) return;
+        
+        const width = container.offsetWidth;
+        if (width >= 250) {
+          adPushedRef.current = true;
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         }
       } catch (err) {
-        console.error("AdSense error:", err);
+        // Silently handle AdSense errors
       }
     };
 
-    // Try immediately
-    loadAd();
+    // Delay initial load to ensure DOM is ready
+    const timeoutId = setTimeout(loadAd, 100);
 
-    // If not loaded, use ResizeObserver to wait for valid width
-    if (!adPushedRef.current && adContainerRef.current) {
-      const observer = new ResizeObserver(() => {
+    // Use ResizeObserver to wait for valid width
+    const observer = new ResizeObserver(() => {
+      if (!adPushedRef.current) {
         loadAd();
-      });
+      }
+    });
+    
+    if (adContainerRef.current) {
       observer.observe(adContainerRef.current);
-      return () => observer.disconnect();
     }
+    
+    return () => {
+      clearTimeout(timeoutId);
+      observer.disconnect();
+    };
   }, []);
 
   const getAdConfig = () => {
@@ -84,11 +100,12 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
 
   return (
     <div className={`my-8 ${className}`}>
-      <div ref={adContainerRef}>
+      <div ref={adContainerRef} style={{ minWidth: "250px" }}>
         <ins
           className="adsbygoogle"
           {...config}
           data-ad-client="ca-pub-9847321075142960"
+          data-adtest={process.env.NODE_ENV === 'development' ? 'on' : undefined}
         />
       </div>
     </div>
