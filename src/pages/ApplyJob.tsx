@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { AdPlacement } from "@/components/AdPlacement";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -134,6 +135,12 @@ const ApplyJob = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+
+      {/* Top Display Ad */}
+      <div className="bg-muted/20 py-4">
+        <AdPlacement type="display" className="container mx-auto px-4" />
+      </div>
+
       <div className="flex-1 bg-muted/30 py-12">
         <div className="container mx-auto px-4 max-w-3xl">
           <Card>
@@ -229,8 +236,15 @@ const ApplyJob = () => {
               </form>
             </CardContent>
           </Card>
+
+          {/* In-Article Ad */}
+          <AdPlacement type="in_article" className="mt-8" />
         </div>
       </div>
+
+      {/* Multiplex Ad */}
+      <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
+
       <Footer />
     </div>
   );

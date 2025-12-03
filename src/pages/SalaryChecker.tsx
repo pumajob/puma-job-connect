@@ -241,6 +241,11 @@ const SalaryChecker = () => {
               </CardContent>
             </Card>
 
+            {/* Mobile Ad after search */}
+            <div className="md:hidden">
+              <AdPlacement type="in_article" className="mb-8" />
+            </div>
+
             {/* Results */}
             {result && (
               <Card className="mb-8">
@@ -273,6 +278,9 @@ const SalaryChecker = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Ad before FAQ */}
+            <AdPlacement type="display" className="mb-8" />
 
             {/* FAQ Section */}
             {faqs.length > 0 && (
