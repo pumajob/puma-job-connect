@@ -228,7 +228,7 @@ const JobDetail = () => {
 
                   {/* Mobile Ad - After Description */}
                   <div className="lg:hidden my-6">
-                    <AdPlacement type="in_article" />
+                    <AdPlacement type="horizontal_banner" />
                   </div>
 
                   {job.requirements && (
@@ -243,7 +243,7 @@ const JobDetail = () => {
                   {/* Mobile Ad - After Requirements */}
                   {job.requirements && (
                     <div className="lg:hidden my-6">
-                      <AdPlacement type="display" lazy />
+                      <AdPlacement type="horizontal_banner" lazy />
                     </div>
                   )}
 
@@ -259,13 +259,13 @@ const JobDetail = () => {
                   {/* Mobile Ad - After Responsibilities */}
                   {job.responsibilities && (
                     <div className="lg:hidden my-6">
-                      <AdPlacement type="in_article" lazy />
+                      <AdPlacement type="horizontal_banner" lazy />
                     </div>
                   )}
                 </CardContent>
               </Card>
 
-              <AdPlacement type="in_article" lazy />
+              <AdPlacement type="horizontal_banner" lazy />
             </div>
 
             {/* Sidebar */}
