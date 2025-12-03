@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
   className?: string;
-  refreshInterval?: number;
 }
 
-export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPlacementProps) => {
+export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
   const adContainerRef = useRef<HTMLDivElement>(null);
   const adPushedRef = useRef(false);
-  const [adLoaded, setAdLoaded] = useState(false);
-  const [adKey, setAdKey] = useState(0);
 
   useEffect(() => {
     if (adPushedRef.current) return;
@@ -24,7 +21,6 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
           if (width >= 250) {
             adPushedRef.current = true;
             (window.adsbygoogle = window.adsbygoogle || []).push({});
-            setAdLoaded(true);
           }
         }
       } catch (err) {
@@ -43,28 +39,7 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
       observer.observe(adContainerRef.current);
       return () => observer.disconnect();
     }
-  }, [adKey]);
-
-  // Ad refresh mechanism
-  useEffect(() => {
-    if (!adLoaded || refreshInterval <= 0) return;
-
-    const refreshAd = () => {
-      if (adContainerRef.current) {
-        const rect = adContainerRef.current.getBoundingClientRect();
-        const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
-        
-        if (isInViewport) {
-          adPushedRef.current = false;
-          setAdKey(prev => prev + 1);
-          setAdLoaded(false);
-        }
-      }
-    };
-
-    const intervalId = setInterval(refreshAd, refreshInterval * 1000);
-    return () => clearInterval(intervalId);
-  }, [adLoaded, refreshInterval]);
+  }, []);
 
   const getAdConfig = () => {
     switch (type) {
@@ -109,7 +84,7 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
 
   return (
     <div className={`my-8 ${className}`}>
-      <div ref={adContainerRef} key={adKey}>
+      <div ref={adContainerRef}>
         <ins
           className="adsbygoogle"
           {...config}
