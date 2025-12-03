@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { JobCard } from "./JobCard";
 import { TrendingUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AdPlacement } from "./AdPlacement";
+import { InFeedAd } from "./InFeedAd";
 
 export const TrendingJobs = () => {
   const { data: trendingJobs, isLoading } = useQuery({
@@ -61,16 +63,30 @@ export const TrendingJobs = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingJobs?.map((job) => (
-              <div key={job.id} className="relative">
-                <JobCard job={job} />
-                {job.views_count && job.views_count > 0 && (
-                  <div className="absolute top-4 right-4 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4" />
-                    {job.views_count} views
+            {trendingJobs?.map((job, index) => (
+              <>
+                <div key={job.id} className="relative">
+                  <JobCard job={job} />
+                  {job.views_count && job.views_count > 0 && (
+                    <div className="absolute top-4 right-4 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm flex items-center gap-1">
+                      <TrendingUp className="w-4 h-4" />
+                      {job.views_count} views
+                    </div>
+                  )}
+                </div>
+                {/* Mobile ad after every 2 jobs */}
+                {(index + 1) % 2 === 0 && index !== (trendingJobs?.length ?? 0) - 1 && (
+                  <div className="lg:hidden col-span-1" key={`trending-mobile-ad-${index}`}>
+                    <AdPlacement type="in_article" />
                   </div>
                 )}
-              </div>
+                {/* Desktop in-feed ad after 3 jobs */}
+                {(index + 1) === 3 && (
+                  <div className="hidden lg:block col-span-1 md:col-span-2 lg:col-span-3" key={`trending-desktop-ad-${index}`}>
+                    <InFeedAd className="my-4" />
+                  </div>
+                )}
+              </>
             ))}
           </div>
         )}

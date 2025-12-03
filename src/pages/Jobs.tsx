@@ -196,14 +196,14 @@ const Jobs = () => {
                 {jobs?.map((job, index) => (
                   <>
                     <JobCard key={job.id} job={job} />
-                    {/* Mobile ad after every 3 jobs */}
-                    {(index + 1) % 3 === 0 && index !== jobs.length - 1 && (
+                    {/* Mobile ad after every 2 jobs */}
+                    {(index + 1) % 2 === 0 && index !== jobs.length - 1 && (
                       <div className="lg:hidden col-span-1" key={`mobile-ad-${index}`}>
                         <AdPlacement type="in_article" />
                       </div>
                     )}
-                    {/* Desktop in-feed ad after every 6 jobs */}
-                    {(index + 1) % 6 === 0 && index !== jobs.length - 1 && (
+                    {/* Desktop in-feed ad after every 4 jobs */}
+                    {(index + 1) % 4 === 0 && index !== jobs.length - 1 && (
                       <div className="hidden lg:block col-span-1 md:col-span-2 lg:col-span-3" key={`ad-${index}`}>
                         <InFeedAd className="my-4" />
                       </div>
