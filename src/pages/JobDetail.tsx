@@ -222,6 +222,11 @@ const JobDetail = () => {
                 </CardContent>
               </Card>
 
+              {/* Mobile Ad - After Title, Before Description */}
+              <div className="lg:hidden">
+                <AdPlacement type="in_article" />
+              </div>
+
               {/* Description Card */}
               <Card>
                 <CardContent className="p-8">
