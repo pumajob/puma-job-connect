@@ -98,42 +98,55 @@ const Provinces = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {provinces?.map((province) => {
+                {provinces?.map((province, index) => {
                   const slug = provinceSlugMap[province.name];
                   return (
-                    <Link 
-                      key={province.id} 
-                      to={`/provinces/${slug}`}
-                      className="group"
-                    >
-                      <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
-                        <CardHeader>
-                          <div className="flex items-center gap-2 mb-2">
-                            <MapPin className="h-6 w-6 text-primary" />
-                            <CardTitle className="text-2xl group-hover:text-primary transition-colors">
-                              {province.name}
-                            </CardTitle>
-                          </div>
-                          <CardDescription className="flex items-center gap-2">
-                            <Briefcase className="h-4 w-4" />
-                            <span className="text-base">
-                              {province.jobCount} {province.jobCount === 1 ? 'job' : 'jobs'} available
-                            </span>
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground">
-                            Browse all job opportunities in {province.name}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                    <>
+                      <Link 
+                        key={province.id} 
+                        to={`/provinces/${slug}`}
+                        className="group"
+                      >
+                        <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
+                          <CardHeader>
+                            <div className="flex items-center gap-2 mb-2">
+                              <MapPin className="h-6 w-6 text-primary" />
+                              <CardTitle className="text-2xl group-hover:text-primary transition-colors">
+                                {province.name}
+                              </CardTitle>
+                            </div>
+                            <CardDescription className="flex items-center gap-2">
+                              <Briefcase className="h-4 w-4" />
+                              <span className="text-base">
+                                {province.jobCount} {province.jobCount === 1 ? 'job' : 'jobs'} available
+                              </span>
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                              Browse all job opportunities in {province.name}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                      {/* Mobile ad after every 3 provinces */}
+                      {(index + 1) % 3 === 0 && index !== (provinces?.length ?? 0) - 1 && (
+                        <div className="md:hidden col-span-1" key={`mobile-ad-${index}`}>
+                          <AdPlacement type="in_article" />
+                        </div>
+                      )}
+                    </>
                   );
                 })}
               </div>
             )}
           </div>
         </section>
+
+        {/* Mobile Ad - Before Multiplex */}
+        <div className="md:hidden bg-muted/20 py-4">
+          <AdPlacement type="display" className="container mx-auto px-4" />
+        </div>
 
         <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
       </main>

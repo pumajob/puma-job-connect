@@ -57,33 +57,41 @@ const Categories = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {categories?.map((category) => (
-                  <Link key={category.id} to={`/categories/${category.slug}`}>
-                    <Card className="group hover:shadow-medium transition-all hover:-translate-y-1">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                              <Briefcase className="h-6 w-6" />
+                {categories?.map((category, index) => (
+                  <>
+                    <Link key={category.id} to={`/categories/${category.slug}`}>
+                      <Card className="group hover:shadow-medium transition-all hover:-translate-y-1">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                                <Briefcase className="h-6 w-6" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                                  {category.name}
+                                </h3>
+                                {category.description && (
+                                  <p className="text-sm text-muted-foreground line-clamp-1">
+                                    {category.description}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
-                                {category.name}
-                              </h3>
-                              {category.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-1">
-                                  {category.description}
-                                </p>
-                              )}
-                            </div>
+                            <Badge variant="secondary">
+                              {category.jobs?.[0]?.count || 0} jobs
+                            </Badge>
                           </div>
-                          <Badge variant="secondary">
-                            {category.jobs?.[0]?.count || 0} jobs
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    {/* Mobile ad after every 4 categories */}
+                    {(index + 1) % 4 === 0 && index !== (categories?.length ?? 0) - 1 && (
+                      <div className="md:hidden col-span-1" key={`mobile-ad-${index}`}>
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                  </>
                 ))}
               </div>
             )}
