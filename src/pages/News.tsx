@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -45,9 +45,13 @@ function NewsCardSkeleton() {
   );
 }
 
-function NewsCard({ article }: { article: any }) {
+function NewsCard({ article, onPrefetch }: { article: any; onPrefetch?: () => void }) {
   return (
-    <Link to={`/news/${article.slug}`} className="group">
+    <Link 
+      to={`/news/${article.slug}`} 
+      className="group"
+      onMouseEnter={onPrefetch}
+    >
       <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1">
         {article.image_url && (
           <div className="relative h-48 overflow-hidden rounded-t-lg">
@@ -80,6 +84,7 @@ function NewsCard({ article }: { article: any }) {
 
 export default function News() {
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileArticles, setMobileArticles] = useState<any[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -88,6 +93,24 @@ export default function News() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const pageSize = isMobile ? MOBILE_LOAD_SIZE : DESKTOP_PAGE_SIZE;
+
+  // Prefetch article detail on hover
+  const prefetchArticle = useCallback((slug: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ["news-detail", slug],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("news")
+          .select("id, title, slug, content, excerpt, image_url, published_at")
+          .eq("slug", slug)
+          .eq("is_active", true)
+          .single();
+        if (error) throw error;
+        return data;
+      },
+      staleTime: 10 * 60 * 1000,
+    });
+  }, [queryClient]);
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -270,7 +293,10 @@ export default function News() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {desktopArticles?.map((article) => (
                       <div key={article.id} className="animate-fade-in">
-                        <NewsCard article={article} />
+                        <NewsCard 
+                          article={article} 
+                          onPrefetch={() => prefetchArticle(article.slug)} 
+                        />
                       </div>
                     ))}
                   </div>
@@ -310,7 +336,10 @@ export default function News() {
                 <div className="md:hidden space-y-4">
                   {mobileArticles.map((article, index) => (
                     <div key={article.id}>
-                      <NewsCard article={article} />
+                      <NewsCard 
+                        article={article} 
+                        onPrefetch={() => prefetchArticle(article.slug)} 
+                      />
                       {/* Ad after every 2 articles */}
                       {(index + 1) % 2 === 0 && index !== mobileArticles.length - 1 && (
                         <div className="mt-4">
