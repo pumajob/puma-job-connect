@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, LogOut, PlusCircle, Settings, BarChart, Pencil, Trash2 } from "lucide-react";
+import { Briefcase, LogOut, PlusCircle, Settings, BarChart, Pencil, Trash2, Newspaper, Loader2 } from "lucide-react";
 import { VisitorStats } from "@/components/VisitorStats";
 import {
   AlertDialog,
@@ -24,6 +24,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null);
+  const [isGeneratingNews, setIsGeneratingNews] = useState(false);
 
   useEffect(() => {
     // Check authentication
@@ -121,6 +122,29 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleGenerateNews = async () => {
+    setIsGeneratingNews(true);
+    try {
+      const response = await supabase.functions.invoke('generate-news');
+      
+      if (response.error) throw response.error;
+      
+      toast({
+        title: "Success",
+        description: "News articles are being generated. This may take a few minutes.",
+      });
+    } catch (error: any) {
+      console.error('Error generating news:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to trigger news generation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingNews(false);
+    }
+  };
+
   if (!user) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -193,10 +217,11 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="jobs" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="jobs">Jobs</TabsTrigger>
                 <TabsTrigger value="applications">Applications</TabsTrigger>
                 <TabsTrigger value="categories">Categories</TabsTrigger>
+                <TabsTrigger value="news">News</TabsTrigger>
                 <TabsTrigger value="ads">Ads</TabsTrigger>
                 <TabsTrigger value="referrals">Referrals</TabsTrigger>
               </TabsList>
@@ -306,6 +331,51 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground mt-4">
                   Category management interface coming soon. Current categories are pre-loaded.
                 </p>
+              </TabsContent>
+
+              <TabsContent value="news" className="pt-4">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-muted-foreground">
+                      Generate and manage news articles
+                    </p>
+                    <Button onClick={handleGenerateNews} disabled={isGeneratingNews}>
+                      {isGeneratingNews ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Newspaper className="h-4 w-4 mr-2" />
+                          Generate News
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <Card className="border-2 border-primary/20">
+                    <CardHeader>
+                      <CardTitle className="text-lg">AI News Generation</CardTitle>
+                      <CardDescription>
+                        Automatically generate career-related news articles using AI
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Click "Generate News" to create 5 new career news articles. The generation process:
+                      </p>
+                      <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground ml-4">
+                        <li>Creates unique South African job market articles</li>
+                        <li>Generates relevant images for each article</li>
+                        <li>Automatically publishes to the News section</li>
+                        <li>Runs automatically every day at 4 AM</li>
+                      </ul>
+                      <p className="text-sm text-muted-foreground mt-4">
+                        <strong>Note:</strong> Generation may take 1-2 minutes to complete.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
               </TabsContent>
 
               <TabsContent value="ads" className="pt-4">
