@@ -28,7 +28,8 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
         if (insElement.getAttribute('data-ad-status')) return;
         
         const width = container.offsetWidth;
-        if (width >= 250) {
+        // Lower threshold for mobile (200px instead of 250px)
+        if (width >= 200) {
           adPushedRef.current = true;
           (window.adsbygoogle = window.adsbygoogle || []).push({});
         }
@@ -100,7 +101,7 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
 
   return (
     <div className={`my-8 ${className}`}>
-      <div ref={adContainerRef} style={{ minWidth: "250px" }}>
+      <div ref={adContainerRef} style={{ minWidth: "200px" }}>
         <ins
           className="adsbygoogle"
           {...config}
