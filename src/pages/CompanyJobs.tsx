@@ -9,10 +9,12 @@ import { InFeedAd } from "@/components/InFeedAd";
 import { AdPlacement } from "@/components/AdPlacement";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, Briefcase, MapPin } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const CompanyJobs = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["company-jobs", slug],
@@ -147,7 +149,9 @@ const CompanyJobs = () => {
                   {jobs.map((job, index) => (
                     <div key={job.id}>
                       <JobCard job={job} />
-                      {(index + 1) % 6 === 0 && <InFeedAd />}
+                      {/* Mobile: ad after every 3 jobs, Desktop: ad after every 6 */}
+                      {isMobile && (index + 1) % 3 === 0 && <AdPlacement type="display" className="mt-4" />}
+                      {!isMobile && (index + 1) % 6 === 0 && <InFeedAd className="mt-4" />}
                     </div>
                   ))}
                 </div>

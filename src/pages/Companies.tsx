@@ -7,7 +7,9 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Briefcase } from "lucide-react";
 import { AdPlacement } from "@/components/AdPlacement";
+import { InFeedAd } from "@/components/InFeedAd";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CompanyWithJobs {
   company_name: string;
@@ -17,6 +19,7 @@ interface CompanyWithJobs {
 }
 
 const Companies = () => {
+  const isMobile = useIsMobile();
   const { data: companies, isLoading } = useQuery({
     queryKey: ["companies-with-job-counts"],
     queryFn: async () => {
@@ -100,46 +103,50 @@ const Companies = () => {
               </div>
             ) : companies && companies.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {companies.map((company) => (
-                  <Link 
-                    key={company.slug} 
-                    to={`/companies/${company.slug}`}
-                    className="group"
-                  >
-                    <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
-                      <CardHeader>
-                        <div className="flex items-start gap-3 mb-2">
-                          {company.company_logo ? (
-                            <img 
-                              src={company.company_logo} 
-                              alt={`${company.company_name} logo`}
-                              className="w-12 h-12 object-contain rounded"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
-                              <Building2 className="h-6 w-6 text-muted-foreground" />
+                {companies.map((company, index) => (
+                  <div key={company.slug}>
+                    <Link 
+                      to={`/companies/${company.slug}`}
+                      className="group"
+                    >
+                      <Card className="h-full transition-all hover:shadow-lg hover:border-primary">
+                        <CardHeader>
+                          <div className="flex items-start gap-3 mb-2">
+                            {company.company_logo ? (
+                              <img 
+                                src={company.company_logo} 
+                                alt={`${company.company_name} logo`}
+                                className="w-12 h-12 object-contain rounded"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                                <Building2 className="h-6 w-6 text-muted-foreground" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-2">
+                                {company.company_name}
+                              </CardTitle>
                             </div>
-                          )}
-                          <div className="flex-1">
-                            <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-2">
-                              {company.company_name}
-                            </CardTitle>
                           </div>
-                        </div>
-                        <CardDescription className="flex items-center gap-2">
-                          <Briefcase className="h-4 w-4" />
-                          <span className="text-base font-semibold">
-                            {company.job_count} {company.job_count === 1 ? 'job' : 'jobs'} available
-                          </span>
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground">
-                          View all open positions at {company.company_name}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </Link>
+                          <CardDescription className="flex items-center gap-2">
+                            <Briefcase className="h-4 w-4" />
+                            <span className="text-base font-semibold">
+                              {company.job_count} {company.job_count === 1 ? 'job' : 'jobs'} available
+                            </span>
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground">
+                            View all open positions at {company.company_name}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                    {/* Mobile: ad after every 3 companies, Desktop: ad after every 6 */}
+                    {isMobile && (index + 1) % 3 === 0 && <AdPlacement type="display" className="mt-6" />}
+                    {!isMobile && (index + 1) % 6 === 0 && <InFeedAd className="mt-6" />}
+                  </div>
                 ))}
               </div>
             ) : (
