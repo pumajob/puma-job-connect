@@ -16,14 +16,20 @@ export default function NewsDetail() {
   const { slug } = useParams<{ slug: string }>();
 
   const { data: article, isLoading } = useQuery({
-    queryKey: ["news", slug],
+    queryKey: ["news-detail", slug],
     queryFn: async () => {
-      const { data, error } = await supabase.from("news").select("*").eq("slug", slug).eq("is_active", true).single();
+      const { data, error } = await supabase
+        .from("news")
+        .select("id, title, slug, content, excerpt, image_url, published_at")
+        .eq("slug", slug)
+        .eq("is_active", true)
+        .single();
 
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     refetchOnWindowFocus: false,
   });
 

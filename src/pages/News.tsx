@@ -102,18 +102,19 @@ export default function News() {
   };
 
   const { data: newsArticles, isLoading } = useQuery({
-    queryKey: ["news"],
+    queryKey: ["news-list"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news")
-        .select("*")
+        .select("id, title, slug, excerpt, image_url, published_at")
         .eq("is_active", true)
         .order("published_at", { ascending: false });
 
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     refetchOnWindowFocus: false,
   });
 
