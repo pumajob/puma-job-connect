@@ -14,8 +14,11 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
   const loadAd = useCallback(() => {
     try {
       if (window.adsbygoogle && adContainerRef.current) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        setAdLoaded(true);
+        const width = adContainerRef.current.offsetWidth;
+        if (width >= 250) {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          setAdLoaded(true);
+        }
       }
     } catch (err) {
       console.error("AdSense error:", err);
@@ -24,7 +27,25 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
 
   useEffect(() => {
     if (adLoaded) return;
-    loadAd();
+    
+    // Wait for container to have valid width
+    const checkAndLoad = () => {
+      if (adContainerRef.current && adContainerRef.current.offsetWidth >= 250) {
+        loadAd();
+      }
+    };
+
+    // Try immediately
+    checkAndLoad();
+
+    // If not loaded, use ResizeObserver to wait for valid width
+    if (!adLoaded && adContainerRef.current) {
+      const observer = new ResizeObserver(() => {
+        if (!adLoaded) checkAndLoad();
+      });
+      observer.observe(adContainerRef.current);
+      return () => observer.disconnect();
+    }
   }, [adLoaded, loadAd]);
 
   // Ad refresh mechanism
