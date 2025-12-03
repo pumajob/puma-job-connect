@@ -169,21 +169,17 @@ export default function NewsDetail() {
             <div className="prose prose-lg dark:prose-invert max-w-none">
               {article.content.split('\n\n').map((paragraph, index, array) => {
                 const midPoint = Math.floor(array.length / 2);
-                const quarterPoint = Math.floor(array.length / 4);
-                const threeQuarterPoint = Math.floor(array.length * 3 / 4);
+                // Mobile: show ad every 2 paragraphs (after index 1, 3, 5, etc.)
+                const showMobileAd = (index + 1) % 2 === 0 && index < array.length - 1;
                 return (
                   <div key={index}>
                     <p className="mb-4 leading-relaxed">
                       {paragraph}
                     </p>
-                    {index === midPoint && <InFeedAd className="my-8" />}
-                    {/* Mobile ads at quarter points */}
-                    {index === quarterPoint && (
-                      <div className="md:hidden my-6">
-                        <AdPlacement type="in_article" />
-                      </div>
-                    )}
-                    {index === threeQuarterPoint && (
+                    {/* Desktop: InFeedAd at midpoint */}
+                    {index === midPoint && <InFeedAd className="my-8 hidden md:block" />}
+                    {/* Mobile: ad every 2 paragraphs */}
+                    {showMobileAd && (
                       <div className="md:hidden my-6">
                         <AdPlacement type="in_article" />
                       </div>
