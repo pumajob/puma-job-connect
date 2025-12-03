@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -14,11 +14,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
+// Helper function to call gtag
+const trackConversion = (sendTo: string) => {
+  const gtag = (window as unknown as { gtag?: (command: string, action: string, params?: Record<string, unknown>) => void }).gtag;
+  if (typeof gtag === 'function') {
+    gtag('event', 'conversion', { 'send_to': sendTo });
+  }
+};
+
 const ApplyJob = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Track Apply page view conversion
+  useEffect(() => {
+    trackConversion('AW-17771331513/m0FrCLeO9sobELn_g5pC');
+  }, []);
   
   // Application form fields
   const [applicantName, setApplicantName] = useState("");
@@ -115,6 +128,9 @@ const ApplyJob = () => {
       });
 
       if (applicationError) throw applicationError;
+
+      // Track successful application submission conversion
+      trackConversion('AW-17771331513/m0FrCLeO9sobELn_g5pC');
 
       toast({ title: "Success", description: "Application submitted! Redirecting..." });
       
