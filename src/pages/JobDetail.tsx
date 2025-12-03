@@ -43,6 +43,16 @@ const JobDetail = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // Google Ads conversion tracking for job page views
+  useEffect(() => {
+    const gtag = (window as unknown as { gtag?: (command: string, action: string, params?: Record<string, unknown>) => void }).gtag;
+    if (typeof gtag === 'function') {
+      gtag('event', 'conversion', {
+        'send_to': 'AW-17771331513/m0FrCLeO9sobELn_g5pC'
+      });
+    }
+  }, [slug]);
+
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", slug],
     queryFn: async () => {
