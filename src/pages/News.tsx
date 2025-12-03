@@ -9,8 +9,81 @@ import { Calendar, Newspaper } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { AdPlacement } from "@/components/AdPlacement";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DESKTOP_PAGE_SIZE = 3;
+const MOBILE_LOAD_SIZE = 1;
+
+function NewsCardSkeleton() {
+  return (
+    <Card className="animate-pulse">
+      <div className="h-48 bg-muted rounded-t-lg" />
+      <CardHeader>
+        <div className="h-6 bg-muted rounded w-3/4 mb-2" />
+        <div className="h-4 bg-muted rounded w-1/2" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <div className="h-3 bg-muted rounded" />
+          <div className="h-3 bg-muted rounded" />
+          <div className="h-3 bg-muted rounded w-5/6" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function NewsCard({ article }: { article: any }) {
+  return (
+    <Link to={`/news/${article.slug}`} className="group">
+      <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1">
+        {article.image_url && (
+          <div className="relative h-48 overflow-hidden rounded-t-lg">
+            <img
+              src={article.image_url}
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          </div>
+        )}
+        <CardHeader>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <Calendar className="h-4 w-4" />
+            <time dateTime={article.published_at}>
+              {format(new Date(article.published_at), "MMMM d, yyyy")}
+            </time>
+          </div>
+          <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+            {article.title}
+          </CardTitle>
+          <CardDescription className="line-clamp-3">
+            {article.excerpt}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    </Link>
+  );
+}
 
 export default function News() {
+  const isMobile = useIsMobile();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mobileArticles, setMobileArticles] = useState<any[]>([]);
+  const [mobileLoadedCount, setMobileLoadedCount] = useState(MOBILE_LOAD_SIZE);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const { data: newsArticles, isLoading } = useQuery({
     queryKey: ["news"],
     queryFn: async () => {
@@ -23,9 +96,56 @@ export default function News() {
       if (error) throw error;
       return data;
     },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+
+  // Reset mobile state when data changes
+  useEffect(() => {
+    if (newsArticles && isMobile) {
+      setMobileArticles(newsArticles.slice(0, MOBILE_LOAD_SIZE));
+      setMobileLoadedCount(MOBILE_LOAD_SIZE);
+    }
+  }, [newsArticles, isMobile]);
+
+  // Load more for mobile infinite scroll
+  const loadMore = useCallback(() => {
+    if (!newsArticles || isLoadingMore) return;
+    if (mobileLoadedCount >= newsArticles.length) return;
+
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      const newCount = mobileLoadedCount + MOBILE_LOAD_SIZE;
+      setMobileArticles(newsArticles.slice(0, newCount));
+      setMobileLoadedCount(newCount);
+      setIsLoadingMore(false);
+    }, 300);
+  }, [newsArticles, mobileLoadedCount, isLoadingMore]);
+
+  // Intersection Observer for mobile infinite scroll
+  useEffect(() => {
+    if (!isMobile || !loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [isMobile, loadMore]);
+
+  // Desktop pagination
+  const totalPages = newsArticles ? Math.ceil(newsArticles.length / DESKTOP_PAGE_SIZE) : 0;
+  const desktopArticles = newsArticles
+    ? newsArticles.slice((currentPage - 1) * DESKTOP_PAGE_SIZE, currentPage * DESKTOP_PAGE_SIZE)
+    : [];
+
+  const hasMoreMobile = newsArticles && mobileLoadedCount < newsArticles.length;
 
   return (
     <>
@@ -67,67 +187,76 @@ export default function News() {
 
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Card key={i} className="animate-pulse">
-                    <div className="h-48 bg-muted rounded-t-lg" />
-                    <CardHeader>
-                      <div className="h-6 bg-muted rounded w-3/4 mb-2" />
-                      <div className="h-4 bg-muted rounded w-1/2" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-muted rounded" />
-                        <div className="h-3 bg-muted rounded" />
-                        <div className="h-3 bg-muted rounded w-5/6" />
-                      </div>
-                    </CardContent>
-                  </Card>
+                {[1, 2, 3].map((i) => (
+                  <NewsCardSkeleton key={i} />
                 ))}
               </div>
             ) : newsArticles && newsArticles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {newsArticles.map((article, index) => (
-                  <>
-                    <Link
-                      key={article.id}
-                      to={`/news/${article.slug}`}
-                      className="group"
-                    >
-                      <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1">
-                        {article.image_url && (
-                          <div className="relative h-48 overflow-hidden rounded-t-lg">
-                            <img
-                              src={article.image_url}
-                              alt={article.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                        )}
-                        <CardHeader>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                            <Calendar className="h-4 w-4" />
-                            <time dateTime={article.published_at}>
-                              {format(new Date(article.published_at), "MMMM d, yyyy")}
-                            </time>
-                          </div>
-                          <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
-                            {article.title}
-                          </CardTitle>
-                          <CardDescription className="line-clamp-3">
-                            {article.excerpt}
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    </Link>
-                    {/* Mobile ad after every 3 articles */}
-                    {(index + 1) % 3 === 0 && index !== (newsArticles?.length ?? 0) - 1 && (
-                      <div className="md:hidden col-span-1" key={`mobile-ad-${index}`}>
-                        <AdPlacement type="in_article" />
-                      </div>
+              <>
+                {/* Desktop View - Pagination */}
+                <div className="hidden md:block">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {desktopArticles.map((article) => (
+                      <NewsCard key={article.id} article={article} />
+                    ))}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <Pagination className="mt-8">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={() => setCurrentPage(page)}
+                              isActive={currentPage === page}
+                              className="cursor-pointer"
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        ))}
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
+
+                {/* Mobile View - Infinite Scroll */}
+                <div className="md:hidden space-y-4">
+                  {mobileArticles.map((article, index) => (
+                    <div key={article.id}>
+                      <NewsCard article={article} />
+                      {/* Ad after every 2 articles */}
+                      {(index + 1) % 2 === 0 && index !== mobileArticles.length - 1 && (
+                        <div className="mt-4">
+                          <AdPlacement type="in_article" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Load more trigger */}
+                  <div ref={loadMoreRef} className="py-4">
+                    {isLoadingMore && (
+                      <NewsCardSkeleton />
                     )}
-                  </>
-                ))}
-              </div>
+                    {!hasMoreMobile && mobileArticles.length > 0 && (
+                      <p className="text-center text-muted-foreground">No more news to load</p>
+                    )}
+                  </div>
+                </div>
+              </>
             ) : (
               <Card className="text-center py-12">
                 <CardContent>
