@@ -34,21 +34,10 @@ const InterviewPractice = () => {
             </div>
 
             <InterviewHelper />
-
-            {/* Mobile Ad */}
-            <div className="md:hidden">
-              <AdPlacement type="in_article" className="mt-6" />
-            </div>
-
-            {/* Display Ad */}
-            <AdPlacement type="display" className="mt-8" />
-
-            {/* In-Article Ad */}
-            <AdPlacement type="in_article" className="mt-8" />
           </div>
         </main>
 
-        {/* Multiplex Ad */}
+        {/* Multiplex Ad at bottom */}
         <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
 
         <Footer />
