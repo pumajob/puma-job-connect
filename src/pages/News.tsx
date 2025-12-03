@@ -21,7 +21,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+
 
 const DESKTOP_PAGE_SIZE = 3;
 const MOBILE_LOAD_SIZE = 1;
@@ -82,11 +82,12 @@ export default function News() {
   const isMobile = useIsMobile();
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileArticles, setMobileArticles] = useState<any[]>([]);
-  const [mobileLoadedCount, setMobileLoadedCount] = useState(MOBILE_LOAD_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isPageChanging, setIsPageChanging] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [hasMoreMobile, setHasMoreMobile] = useState(true);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const pageSize = isMobile ? MOBILE_LOAD_SIZE : DESKTOP_PAGE_SIZE;
 
   // Scroll to top button visibility
   useEffect(() => {
@@ -101,44 +102,95 @@ export default function News() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const { data: newsArticles, isLoading } = useQuery({
-    queryKey: ["news-list"],
+  // Get total count for pagination
+  const { data: totalCount } = useQuery({
+    queryKey: ["news-count"],
     queryFn: async () => {
+      const { count, error } = await supabase
+        .from("news")
+        .select("id", { count: "exact", head: true })
+        .eq("is_active", true);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Desktop: fetch current page only
+  const { data: desktopArticles, isLoading: isDesktopLoading } = useQuery({
+    queryKey: ["news-desktop", currentPage],
+    queryFn: async () => {
+      const from = (currentPage - 1) * DESKTOP_PAGE_SIZE;
+      const to = from + DESKTOP_PAGE_SIZE - 1;
+
       const { data, error } = await supabase
         .from("news")
         .select("id, title, slug, excerpt, image_url, published_at")
         .eq("is_active", true)
-        .order("published_at", { ascending: false });
+        .order("published_at", { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
       return data;
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
+    enabled: !isMobile,
   });
 
-  // Reset mobile state when data changes
-  useEffect(() => {
-    if (newsArticles && isMobile) {
-      setMobileArticles(newsArticles.slice(0, MOBILE_LOAD_SIZE));
-      setMobileLoadedCount(MOBILE_LOAD_SIZE);
-    }
-  }, [newsArticles, isMobile]);
+  // Mobile: fetch next batch
+  const fetchMobileNews = useCallback(async (from: number) => {
+    const to = from + MOBILE_LOAD_SIZE - 1;
+
+    const { data, error } = await supabase
+      .from("news")
+      .select("id, title, slug, excerpt, image_url, published_at")
+      .eq("is_active", true)
+      .order("published_at", { ascending: false })
+      .range(from, to);
+
+    if (error) throw error;
+    return data || [];
+  }, []);
+
+  // Initial mobile load
+  const { isLoading: isMobileInitialLoading } = useQuery({
+    queryKey: ["news-mobile-initial"],
+    queryFn: async () => {
+      const data = await fetchMobileNews(0);
+      setMobileArticles(data);
+      setHasMoreMobile(data.length === MOBILE_LOAD_SIZE);
+      return data;
+    },
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    enabled: isMobile === true,
+  });
 
   // Load more for mobile infinite scroll
-  const loadMore = useCallback(() => {
-    if (!newsArticles || isLoadingMore) return;
-    if (mobileLoadedCount >= newsArticles.length) return;
+  const loadMore = useCallback(async () => {
+    if (isLoadingMore || !hasMoreMobile) return;
 
     setIsLoadingMore(true);
-    setTimeout(() => {
-      const newCount = mobileLoadedCount + MOBILE_LOAD_SIZE;
-      setMobileArticles(newsArticles.slice(0, newCount));
-      setMobileLoadedCount(newCount);
+    try {
+      const newData = await fetchMobileNews(mobileArticles.length);
+      if (newData.length > 0) {
+        setMobileArticles(prev => [...prev, ...newData]);
+        setHasMoreMobile(newData.length === MOBILE_LOAD_SIZE);
+      } else {
+        setHasMoreMobile(false);
+      }
+    } catch (error) {
+      console.error("Error loading more news:", error);
+    } finally {
       setIsLoadingMore(false);
-    }, 300);
-  }, [newsArticles, mobileLoadedCount, isLoadingMore]);
+    }
+  }, [mobileArticles.length, isLoadingMore, hasMoreMobile, fetchMobileNews]);
 
   // Intersection Observer for mobile infinite scroll
   useEffect(() => {
@@ -157,24 +209,15 @@ export default function News() {
     return () => observer.disconnect();
   }, [isMobile, loadMore]);
 
-  // Handle page change with loading animation
+  // Handle page change
   const handlePageChange = useCallback((newPage: number) => {
     if (newPage === currentPage) return;
-    setIsPageChanging(true);
-    setTimeout(() => {
-      setCurrentPage(newPage);
-      setIsPageChanging(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 300);
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
 
-  // Desktop pagination
-  const totalPages = newsArticles ? Math.ceil(newsArticles.length / DESKTOP_PAGE_SIZE) : 0;
-  const desktopArticles = newsArticles
-    ? newsArticles.slice((currentPage - 1) * DESKTOP_PAGE_SIZE, currentPage * DESKTOP_PAGE_SIZE)
-    : [];
-
-  const hasMoreMobile = newsArticles && mobileLoadedCount < newsArticles.length;
+  const totalPages = totalCount ? Math.ceil(totalCount / DESKTOP_PAGE_SIZE) : 0;
+  const isLoading = isMobile ? isMobileInitialLoading : isDesktopLoading;
 
   return (
     <>
@@ -220,25 +263,17 @@ export default function News() {
                   <NewsCardSkeleton key={i} />
                 ))}
               </div>
-            ) : newsArticles && newsArticles.length > 0 ? (
+            ) : (desktopArticles && desktopArticles.length > 0) || mobileArticles.length > 0 ? (
               <>
                 {/* Desktop View - Pagination */}
                 <div className="hidden md:block">
-                  {isPageChanging ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-                      {[1, 2, 3].map((i) => (
-                        <NewsCardSkeleton key={i} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {desktopArticles.map((article) => (
-                        <div key={article.id} className="animate-fade-in">
-                          <NewsCard article={article} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {desktopArticles?.map((article) => (
+                      <div key={article.id} className="animate-fade-in">
+                        <NewsCard article={article} />
+                      </div>
+                    ))}
+                  </div>
 
                   {totalPages > 1 && (
                     <Pagination className="mt-8">
