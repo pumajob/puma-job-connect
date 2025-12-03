@@ -1,16 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
   className?: string;
   lazy?: boolean;
+  refreshInterval?: number; // Refresh interval in seconds (default: 60)
 }
 
-export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementProps) => {
+export const AdPlacement = ({ type, className = "", lazy = false, refreshInterval = 60 }: AdPlacementProps) => {
   const adRef = useRef<HTMLDivElement>(null);
+  const adContainerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(!lazy);
   const [adLoaded, setAdLoaded] = useState(false);
+  const [adKey, setAdKey] = useState(0); // Key to force re-render for refresh
 
   const getMinHeight = () => {
     switch (type) {
@@ -49,18 +52,43 @@ export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementP
   }, [lazy, isVisible]);
 
   // Load ad when visible
-  useEffect(() => {
-    if (!isVisible || adLoaded) return;
-
+  const loadAd = useCallback(() => {
     try {
-      if (window.adsbygoogle && adRef.current) {
+      if (window.adsbygoogle && adContainerRef.current) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
         setAdLoaded(true);
       }
     } catch (err) {
       console.error("AdSense error:", err);
     }
-  }, [isVisible, adLoaded]);
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || adLoaded) return;
+    loadAd();
+  }, [isVisible, adLoaded, loadAd]);
+
+  // Ad refresh mechanism - only refresh when ad is visible in viewport
+  useEffect(() => {
+    if (!isVisible || !adLoaded || refreshInterval <= 0) return;
+
+    const refreshAd = () => {
+      // Check if ad is still in viewport before refreshing
+      if (adRef.current) {
+        const rect = adRef.current.getBoundingClientRect();
+        const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+        
+        if (isInViewport) {
+          setAdKey(prev => prev + 1);
+          setAdLoaded(false);
+        }
+      }
+    };
+
+    const intervalId = setInterval(refreshAd, refreshInterval * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isVisible, adLoaded, refreshInterval]);
 
   const getAdConfig = () => {
     switch (type) {
@@ -115,11 +143,13 @@ export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementP
         </div>
       )}
       {isVisible && (
-        <ins
-          className="adsbygoogle"
-          {...config}
-          data-ad-client="ca-pub-9847321075142960"
-        />
+        <div ref={adContainerRef} key={adKey}>
+          <ins
+            className="adsbygoogle"
+            {...config}
+            data-ad-client="ca-pub-9847321075142960"
+          />
+        </div>
       )}
     </div>
   );
