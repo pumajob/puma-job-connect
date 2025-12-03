@@ -11,6 +11,8 @@ import { format } from "date-fns";
 import { AdPlacement } from "@/components/AdPlacement";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ArrowUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -83,7 +85,21 @@ export default function News() {
   const [mobileLoadedCount, setMobileLoadedCount] = useState(MOBILE_LOAD_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isPageChanging, setIsPageChanging] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const { data: newsArticles, isLoading } = useQuery({
     queryKey: ["news"],
@@ -303,6 +319,18 @@ export default function News() {
 
         {/* Multiplex Ad */}
         <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
+
+        {/* Scroll to Top Button */}
+        {showScrollTop && (
+          <Button
+            onClick={scrollToTop}
+            className="fixed bottom-6 right-6 z-50 rounded-full w-12 h-12 shadow-lg animate-fade-in"
+            size="icon"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        )}
 
         <Footer />
       </div>
