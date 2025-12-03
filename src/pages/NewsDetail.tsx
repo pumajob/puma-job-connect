@@ -110,6 +110,11 @@ export default function NewsDetail() {
       <div className="min-h-screen bg-background">
         <Navbar />
         
+        {/* Mobile Ad - Top */}
+        <div className="md:hidden container mx-auto px-4 pt-4">
+          <AdPlacement type="horizontal_banner" />
+        </div>
+        
         <main className="container mx-auto px-4 py-8">
           <article className="max-w-4xl mx-auto">
             <div className="mb-6">
@@ -156,18 +161,41 @@ export default function NewsDetail() {
               </div>
             )}
 
+            {/* Mobile Ad - After Image */}
+            <div className="md:hidden mb-6">
+              <AdPlacement type="in_article" />
+            </div>
+
             <div className="prose prose-lg dark:prose-invert max-w-none">
               {article.content.split('\n\n').map((paragraph, index, array) => {
                 const midPoint = Math.floor(array.length / 2);
+                const quarterPoint = Math.floor(array.length / 4);
+                const threeQuarterPoint = Math.floor(array.length * 3 / 4);
                 return (
                   <div key={index}>
                     <p className="mb-4 leading-relaxed">
                       {paragraph}
                     </p>
                     {index === midPoint && <InFeedAd className="my-8" />}
+                    {/* Mobile ads at quarter points */}
+                    {index === quarterPoint && (
+                      <div className="md:hidden my-6">
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                    {index === threeQuarterPoint && (
+                      <div className="md:hidden my-6">
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
                   </div>
                 );
               })}
+            </div>
+
+            {/* Mobile Ad - After Content */}
+            <div className="md:hidden mt-6">
+              <AdPlacement type="display" />
             </div>
 
             <div className="mt-12 pt-8 border-t">

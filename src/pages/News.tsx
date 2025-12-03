@@ -60,6 +60,11 @@ export default function News() {
 
             <AdPlacement type="display" className="mb-8" />
 
+            {/* Mobile Ad - After Header */}
+            <div className="md:hidden mb-6">
+              <AdPlacement type="in_article" />
+            </div>
+
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -81,38 +86,46 @@ export default function News() {
               </div>
             ) : newsArticles && newsArticles.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {newsArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    to={`/news/${article.slug}`}
-                    className="group"
-                  >
-                    <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1">
-                      {article.image_url && (
-                        <div className="relative h-48 overflow-hidden rounded-t-lg">
-                          <img
-                            src={article.image_url}
-                            alt={article.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      )}
-                      <CardHeader>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                          <Calendar className="h-4 w-4" />
-                          <time dateTime={article.published_at}>
-                            {format(new Date(article.published_at), "MMMM d, yyyy")}
-                          </time>
-                        </div>
-                        <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
-                          {article.title}
-                        </CardTitle>
-                        <CardDescription className="line-clamp-3">
-                          {article.excerpt}
-                        </CardDescription>
-                      </CardHeader>
-                    </Card>
-                  </Link>
+                {newsArticles.map((article, index) => (
+                  <>
+                    <Link
+                      key={article.id}
+                      to={`/news/${article.slug}`}
+                      className="group"
+                    >
+                      <Card className="h-full transition-all hover:shadow-lg hover:-translate-y-1">
+                        {article.image_url && (
+                          <div className="relative h-48 overflow-hidden rounded-t-lg">
+                            <img
+                              src={article.image_url}
+                              alt={article.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        )}
+                        <CardHeader>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <Calendar className="h-4 w-4" />
+                            <time dateTime={article.published_at}>
+                              {format(new Date(article.published_at), "MMMM d, yyyy")}
+                            </time>
+                          </div>
+                          <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                            {article.title}
+                          </CardTitle>
+                          <CardDescription className="line-clamp-3">
+                            {article.excerpt}
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+                    {/* Mobile ad after every 3 articles */}
+                    {(index + 1) % 3 === 0 && index !== (newsArticles?.length ?? 0) - 1 && (
+                      <div className="md:hidden col-span-1" key={`mobile-ad-${index}`}>
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                  </>
                 ))}
               </div>
             ) : (
@@ -129,6 +142,11 @@ export default function News() {
 
             {/* In-Article Ad */}
             <AdPlacement type="in_article" className="mt-8" />
+
+            {/* Mobile Ad - Before Multiplex */}
+            <div className="md:hidden mt-6">
+              <AdPlacement type="display" />
+            </div>
           </div>
         </main>
 
