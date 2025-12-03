@@ -255,6 +255,13 @@ const JobDetail = () => {
                       </p>
                     </div>
                   )}
+
+                  {/* Mobile Ad - After Responsibilities */}
+                  {job.responsibilities && (
+                    <div className="lg:hidden my-6">
+                      <AdPlacement type="in_article" />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
