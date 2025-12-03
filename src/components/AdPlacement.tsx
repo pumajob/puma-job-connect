@@ -22,21 +22,21 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
     switch (type) {
       case "in_article":
         return {
-          style: { display: "block", textAlign: "center" } as React.CSSProperties,
+          style: { display: "block", textAlign: "center", minHeight: "280px" } as React.CSSProperties,
           "data-ad-layout": "in-article",
           "data-ad-format": "fluid",
           "data-ad-slot": "6521724398",
         };
       case "display":
         return {
-          style: { display: "block" } as React.CSSProperties,
+          style: { display: "block", minHeight: "250px" } as React.CSSProperties,
           "data-ad-format": "auto",
           "data-ad-slot": "3154909234",
           "data-full-width-responsive": "true",
         };
       case "multiplex":
         return {
-          style: { display: "block" } as React.CSSProperties,
+          style: { display: "block", minHeight: "300px" } as React.CSSProperties,
           "data-ad-format": "autorelaxed",
           "data-ad-slot": "6159596154",
         };
@@ -49,8 +49,10 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
         };
       case "horizontal_banner":
         return {
-          style: { display: "inline-block", width: "728px", height: "90px" } as React.CSSProperties,
+          style: { display: "block", minHeight: "100px", width: "100%", maxWidth: "728px" } as React.CSSProperties,
+          "data-ad-format": "auto",
           "data-ad-slot": "3154909234",
+          "data-full-width-responsive": "true",
         };
     }
   };

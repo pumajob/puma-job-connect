@@ -216,12 +216,24 @@ const JobDetail = () => {
                     </p>
                   </div>
 
+                  {/* Mobile Ad - After Description */}
+                  <div className="lg:hidden my-6">
+                    <AdPlacement type="in_article" />
+                  </div>
+
                   {job.requirements && (
                     <div className="prose max-w-none mb-8">
                       <h2 className="text-xl font-semibold mb-3">Requirements</h2>
                       <p className="whitespace-pre-wrap text-muted-foreground">
                         {job.requirements}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Mobile Ad - After Requirements */}
+                  {job.requirements && (
+                    <div className="lg:hidden my-6">
+                      <AdPlacement type="display" />
                     </div>
                   )}
 
