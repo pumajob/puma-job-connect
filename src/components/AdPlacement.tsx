@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
@@ -8,45 +8,42 @@ interface AdPlacementProps {
 
 export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPlacementProps) => {
   const adContainerRef = useRef<HTMLDivElement>(null);
+  const adPushedRef = useRef(false);
   const [adLoaded, setAdLoaded] = useState(false);
   const [adKey, setAdKey] = useState(0);
 
-  const loadAd = useCallback(() => {
-    try {
-      if (window.adsbygoogle && adContainerRef.current) {
-        const width = adContainerRef.current.offsetWidth;
-        if (width >= 250) {
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-          setAdLoaded(true);
-        }
-      }
-    } catch (err) {
-      console.error("AdSense error:", err);
-    }
-  }, []);
-
   useEffect(() => {
-    if (adLoaded) return;
-    
-    // Wait for container to have valid width
-    const checkAndLoad = () => {
-      if (adContainerRef.current && adContainerRef.current.offsetWidth >= 250) {
-        loadAd();
+    if (adPushedRef.current) return;
+
+    const loadAd = () => {
+      if (adPushedRef.current) return;
+      
+      try {
+        if (window.adsbygoogle && adContainerRef.current) {
+          const width = adContainerRef.current.offsetWidth;
+          if (width >= 250) {
+            adPushedRef.current = true;
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            setAdLoaded(true);
+          }
+        }
+      } catch (err) {
+        console.error("AdSense error:", err);
       }
     };
 
     // Try immediately
-    checkAndLoad();
+    loadAd();
 
     // If not loaded, use ResizeObserver to wait for valid width
-    if (!adLoaded && adContainerRef.current) {
+    if (!adPushedRef.current && adContainerRef.current) {
       const observer = new ResizeObserver(() => {
-        if (!adLoaded) checkAndLoad();
+        loadAd();
       });
       observer.observe(adContainerRef.current);
       return () => observer.disconnect();
     }
-  }, [adLoaded, loadAd]);
+  }, [adKey]);
 
   // Ad refresh mechanism
   useEffect(() => {
@@ -58,6 +55,7 @@ export const AdPlacement = ({ type, className = "", refreshInterval = 60 }: AdPl
         const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
         
         if (isInViewport) {
+          adPushedRef.current = false;
           setAdKey(prev => prev + 1);
           setAdLoaded(false);
         }
