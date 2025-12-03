@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { JobCard } from "@/components/JobCard";
 import { AdPlacement } from "@/components/AdPlacement";
+import { InFeedAd } from "@/components/InFeedAd";
 import { TrendingJobs } from "@/components/TrendingJobs";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { WebsiteStructuredData } from "@/components/seo/StructuredData";
@@ -174,6 +175,12 @@ const Index = () => {
                   {(index + 1) % 2 === 0 && index !== (featuredJobs?.length ?? 0) - 1 && (
                     <div className="lg:hidden col-span-1" key={`mobile-ad-${index}`}>
                       <AdPlacement type="in_article" />
+                    </div>
+                  )}
+                  {/* Desktop in-feed ad after 3 jobs */}
+                  {(index + 1) === 3 && (
+                    <div className="hidden lg:block col-span-1 md:col-span-2 lg:col-span-3" key={`desktop-ad-${index}`}>
+                      <InFeedAd className="my-4" />
                     </div>
                   )}
                 </>
