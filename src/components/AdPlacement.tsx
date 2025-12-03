@@ -1,22 +1,55 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AdPlacementProps {
   type: "in_article" | "display" | "multiplex" | "sticky_sidebar" | "horizontal_banner";
   className?: string;
+  lazy?: boolean;
 }
 
-export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
+export const AdPlacement = ({ type, className = "", lazy = false }: AdPlacementProps) => {
   const adRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(!lazy);
+  const [adLoaded, setAdLoaded] = useState(false);
 
+  // Lazy loading with Intersection Observer
   useEffect(() => {
+    if (!lazy || isVisible) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: "200px", // Load ad 200px before it enters viewport
+        threshold: 0,
+      }
+    );
+
+    if (adRef.current) {
+      observer.observe(adRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [lazy, isVisible]);
+
+  // Load ad when visible
+  useEffect(() => {
+    if (!isVisible || adLoaded) return;
+
     try {
       if (window.adsbygoogle && adRef.current) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
+        setAdLoaded(true);
       }
     } catch (err) {
       console.error("AdSense error:", err);
     }
-  }, []);
+  }, [isVisible, adLoaded]);
 
   const getAdConfig = () => {
     switch (type) {
@@ -61,11 +94,13 @@ export const AdPlacement = ({ type, className = "" }: AdPlacementProps) => {
 
   return (
     <div ref={adRef} className={`my-8 ${className}`}>
-      <ins
-        className="adsbygoogle"
-        {...config}
-        data-ad-client="ca-pub-9847321075142960"
-      />
+      {isVisible && (
+        <ins
+          className="adsbygoogle"
+          {...config}
+          data-ad-client="ca-pub-9847321075142960"
+        />
+      )}
     </div>
   );
 };
