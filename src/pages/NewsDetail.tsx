@@ -18,12 +18,7 @@ export default function NewsDetail() {
   const { data: article, isLoading } = useQuery({
     queryKey: ["news", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("news")
-        .select("*")
-        .eq("slug", slug)
-        .eq("is_active", true)
-        .single();
+      const { data, error } = await supabase.from("news").select("*").eq("slug", slug).eq("is_active", true).single();
 
       if (error) throw error;
       return data;
@@ -102,19 +97,16 @@ export default function NewsDetail() {
         author="South Africa Jobs"
         section="News"
       />
-      <ArticleStructuredData
-        article={article}
-        url={`${window.location.origin}/news/${article.slug}`}
-      />
+      <ArticleStructuredData article={article} url={`${window.location.origin}/news/${article.slug}`} />
 
       <div className="min-h-screen bg-background">
         <Navbar />
-        
+
         {/* Mobile Ad - Top */}
         <div className="md:hidden container mx-auto px-4 pt-4">
           <AdPlacement type="horizontal_banner" />
         </div>
-        
+
         <main className="container mx-auto px-4 py-8">
           <article className="max-w-4xl mx-auto">
             <div className="mb-6">
@@ -125,8 +117,6 @@ export default function NewsDetail() {
                 </Link>
               </Button>
 
-              <AdPlacement type="display" />
-              
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
@@ -140,24 +130,15 @@ export default function NewsDetail() {
                 </Button>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-                {article.title}
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">{article.title}</h1>
 
-              {article.excerpt && (
-                <p className="text-xl text-muted-foreground leading-relaxed">
-                  {article.excerpt}
-                </p>
-              )}
+              {article.excerpt && <p className="text-xl text-muted-foreground leading-relaxed">{article.excerpt}</p>}
             </div>
+            <AdPlacement type="display" />
 
             {article.image_url && (
               <div className="relative w-full h-[400px] md:h-[500px] mb-8 rounded-lg overflow-hidden">
-                <img
-                  src={article.image_url}
-                  alt={article.title}
-                  className="w-full h-full object-cover"
-                />
+                <img src={article.image_url} alt={article.title} className="w-full h-full object-cover" />
               </div>
             )}
 
@@ -167,15 +148,13 @@ export default function NewsDetail() {
             </div>
 
             <div className="prose prose-lg dark:prose-invert max-w-none">
-              {article.content.split('\n\n').map((paragraph, index, array) => {
+              {article.content.split("\n\n").map((paragraph, index, array) => {
                 const midPoint = Math.floor(array.length / 2);
                 // Mobile: show ad every 2 paragraphs (after index 1, 3, 5, etc.)
                 const showMobileAd = (index + 1) % 2 === 0 && index < array.length - 1;
                 return (
                   <div key={index}>
-                    <p className="mb-4 leading-relaxed">
-                      {paragraph}
-                    </p>
+                    <p className="mb-4 leading-relaxed">{paragraph}</p>
                     {/* Desktop: InFeedAd at midpoint */}
                     {index === midPoint && <InFeedAd className="my-8 hidden md:block" />}
                     {/* Mobile: ad every 2 paragraphs */}
