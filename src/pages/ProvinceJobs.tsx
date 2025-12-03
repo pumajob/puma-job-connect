@@ -154,6 +154,11 @@ const ProvinceJobs = () => {
           <AdPlacement type="display" className="container mx-auto px-4" />
         </div>
 
+        {/* Mobile Ad - After Header */}
+        <div className="md:hidden bg-muted/20 py-4">
+          <AdPlacement type="in_article" className="container mx-auto px-4" />
+        </div>
+
         {/* Jobs Listing */}
         <section className="py-12 bg-background">
           <div className="container mx-auto px-4">
@@ -166,10 +171,23 @@ const ProvinceJobs = () => {
             ) : jobs && jobs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {jobs.map((job, index) => (
-                  <div key={job.id}>
-                    <JobCard job={job} />
-                    {(index + 1) % 6 === 0 && <InFeedAd />}
-                  </div>
+                  <>
+                    <div key={job.id}>
+                      <JobCard job={job} />
+                    </div>
+                    {/* Mobile ad after every 3 jobs */}
+                    {(index + 1) % 3 === 0 && index !== jobs.length - 1 && (
+                      <div className="md:hidden col-span-1" key={`mobile-ad-${index}`}>
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                    {/* Desktop in-feed ad after every 6 jobs */}
+                    {(index + 1) % 6 === 0 && index !== jobs.length - 1 && (
+                      <div className="hidden md:block col-span-1 md:col-span-2 lg:col-span-3" key={`infeed-ad-${index}`}>
+                        <InFeedAd />
+                      </div>
+                    )}
+                  </>
                 ))}
               </div>
             ) : (
@@ -183,6 +201,11 @@ const ProvinceJobs = () => {
             )}
           </div>
         </section>
+
+        {/* Mobile Ad - Before Multiplex */}
+        <div className="md:hidden bg-muted/20 py-4">
+          <AdPlacement type="display" className="container mx-auto px-4" />
+        </div>
 
         {/* Multiplex Ad */}
         <AdPlacement type="multiplex" className="container mx-auto px-4 py-8" />
