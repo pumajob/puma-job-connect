@@ -167,8 +167,16 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredJobs?.map((job) => (
-                <JobCard key={job.id} job={job} />
+              {featuredJobs?.map((job, index) => (
+                <>
+                  <JobCard key={job.id} job={job} />
+                  {/* Mobile ad after every 2 jobs */}
+                  {(index + 1) % 2 === 0 && index !== (featuredJobs?.length ?? 0) - 1 && (
+                    <div className="lg:hidden col-span-1" key={`mobile-ad-${index}`}>
+                      <AdPlacement type="in_article" />
+                    </div>
+                  )}
+                </>
               ))}
             </div>
           )}
@@ -186,8 +194,18 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Mobile Ad - After Featured Jobs */}
+      <div className="lg:hidden bg-muted/20 py-4">
+        <AdPlacement type="display" className="container mx-auto px-4" />
+      </div>
+
       {/* Trending Jobs Section */}
       <TrendingJobs />
+
+      {/* Mobile Ad - After Trending Jobs */}
+      <div className="lg:hidden bg-muted/20 py-4">
+        <AdPlacement type="in_article" className="container mx-auto px-4" />
+      </div>
 
       {/* In-Article Ad */}
       <AdPlacement type="in_article" className="container mx-auto px-4" />

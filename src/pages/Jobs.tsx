@@ -174,6 +174,11 @@ const Jobs = () => {
             </div>
           </div>
 
+          {/* Mobile Ad - After Filters */}
+          <div className="lg:hidden mb-6">
+            <AdPlacement type="in_article" />
+          </div>
+
           {/* Results */}
           <div className="mb-4 text-muted-foreground">
             {jobs && `${jobs.length} jobs found`}
@@ -191,9 +196,15 @@ const Jobs = () => {
                 {jobs?.map((job, index) => (
                   <>
                     <JobCard key={job.id} job={job} />
-                    {/* Insert in-feed ad after every 5 jobs */}
-                    {(index + 1) % 5 === 0 && index !== jobs.length - 1 && (
-                      <div className="col-span-1 md:col-span-2 lg:col-span-3" key={`ad-${index}`}>
+                    {/* Mobile ad after every 3 jobs */}
+                    {(index + 1) % 3 === 0 && index !== jobs.length - 1 && (
+                      <div className="lg:hidden col-span-1" key={`mobile-ad-${index}`}>
+                        <AdPlacement type="in_article" />
+                      </div>
+                    )}
+                    {/* Desktop in-feed ad after every 6 jobs */}
+                    {(index + 1) % 6 === 0 && index !== jobs.length - 1 && (
+                      <div className="hidden lg:block col-span-1 md:col-span-2 lg:col-span-3" key={`ad-${index}`}>
                         <InFeedAd className="my-4" />
                       </div>
                     )}
@@ -211,6 +222,11 @@ const Jobs = () => {
             </>
           )}
         </div>
+      </div>
+
+      {/* Mobile Ad - Before Multiplex */}
+      <div className="lg:hidden bg-muted/20 py-4">
+        <AdPlacement type="display" className="container mx-auto px-4" />
       </div>
 
       {/* Multiplex Ad */}
