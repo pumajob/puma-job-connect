@@ -82,6 +82,7 @@ export default function News() {
   const [mobileArticles, setMobileArticles] = useState<any[]>([]);
   const [mobileLoadedCount, setMobileLoadedCount] = useState(MOBILE_LOAD_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isPageChanging, setIsPageChanging] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const { data: newsArticles, isLoading } = useQuery({
@@ -139,6 +140,17 @@ export default function News() {
     return () => observer.disconnect();
   }, [isMobile, loadMore]);
 
+  // Handle page change with loading animation
+  const handlePageChange = useCallback((newPage: number) => {
+    if (newPage === currentPage) return;
+    setIsPageChanging(true);
+    setTimeout(() => {
+      setCurrentPage(newPage);
+      setIsPageChanging(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 300);
+  }, [currentPage]);
+
   // Desktop pagination
   const totalPages = newsArticles ? Math.ceil(newsArticles.length / DESKTOP_PAGE_SIZE) : 0;
   const desktopArticles = newsArticles
@@ -195,25 +207,35 @@ export default function News() {
               <>
                 {/* Desktop View - Pagination */}
                 <div className="hidden md:block">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {desktopArticles.map((article) => (
-                      <NewsCard key={article.id} article={article} />
-                    ))}
-                  </div>
+                  {isPageChanging ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+                      {[1, 2, 3].map((i) => (
+                        <NewsCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {desktopArticles.map((article) => (
+                        <div key={article.id} className="animate-fade-in">
+                          <NewsCard article={article} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {totalPages > 1 && (
                     <Pagination className="mt-8">
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious
-                            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                             className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                           />
                         </PaginationItem>
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                           <PaginationItem key={page}>
                             <PaginationLink
-                              onClick={() => setCurrentPage(page)}
+                              onClick={() => handlePageChange(page)}
                               isActive={currentPage === page}
                               className="cursor-pointer"
                             >
@@ -223,7 +245,7 @@ export default function News() {
                         ))}
                         <PaginationItem>
                           <PaginationNext
-                            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                             className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                           />
                         </PaginationItem>
