@@ -35,6 +35,14 @@ const InterviewPractice = () => {
 
             <InterviewHelper />
 
+            {/* Mobile Ad */}
+            <div className="md:hidden">
+              <AdPlacement type="in_article" className="mt-6" />
+            </div>
+
+            {/* Display Ad */}
+            <AdPlacement type="display" className="mt-8" />
+
             {/* In-Article Ad */}
             <AdPlacement type="in_article" className="mt-8" />
           </div>
