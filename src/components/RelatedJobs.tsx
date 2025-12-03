@@ -110,7 +110,7 @@ export const RelatedJobs = ({ currentJobId, categoryId, provinceId, jobType }: R
 
       <div className="grid gap-4">
         {relatedJobs.map((job: Job) => (
-          <Link key={job.id} to={`/jobs/${job.slug}`}>
+          <Link key={job.id} to={`/jobs/${job.slug}`} onClick={() => window.scrollTo(0, 0)}>
             <Card className="group hover:shadow-md transition-all hover:border-primary/20">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
