@@ -226,24 +226,12 @@ const JobDetail = () => {
                     </p>
                   </div>
 
-                  {/* Mobile Ad - After Description */}
-                  <div className="lg:hidden my-6">
-                    <AdPlacement type="horizontal_banner" />
-                  </div>
-
                   {job.requirements && (
                     <div className="prose max-w-none mb-8">
                       <h2 className="text-xl font-semibold mb-3">Requirements</h2>
                       <p className="whitespace-pre-wrap text-muted-foreground">
                         {job.requirements}
                       </p>
-                    </div>
-                  )}
-
-                  {/* Mobile Ad - After Requirements */}
-                  {job.requirements && (
-                    <div className="lg:hidden my-6">
-                      <AdPlacement type="horizontal_banner" lazy />
                     </div>
                   )}
 
@@ -255,17 +243,8 @@ const JobDetail = () => {
                       </p>
                     </div>
                   )}
-
-                  {/* Mobile Ad - After Responsibilities */}
-                  {job.responsibilities && (
-                    <div className="lg:hidden my-6">
-                      <AdPlacement type="horizontal_banner" lazy />
-                    </div>
-                  )}
                 </CardContent>
               </Card>
-
-              <AdPlacement type="horizontal_banner" lazy />
             </div>
 
             {/* Sidebar */}
@@ -374,24 +353,25 @@ const JobDetail = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Sticky Sidebar Ad */}
-              <div className="sticky top-[500px]">
-                <AdPlacement type="sticky_sidebar" lazy />
-              </div>
             </div>
           </div>
+        </div>
 
-          {/* Related Jobs Section */}
-          <div className="container mx-auto px-4 py-12">
-            <RelatedJobs
-              currentJobId={job.id}
-              categoryId={job.category_id}
-              provinceId={job.province_id}
-              jobType={job.job_type}
-            />
-          </div>
+        {/* Ad Placements - Outside grid for full width */}
+        <div className="container mx-auto px-4">
+          <AdPlacement type="horizontal_banner" />
+          <AdPlacement type="horizontal_banner" lazy />
+          <AdPlacement type="horizontal_banner" lazy />
+        </div>
 
+        {/* Related Jobs Section */}
+        <div className="container mx-auto px-4 py-12">
+          <RelatedJobs
+            currentJobId={job.id}
+            categoryId={job.category_id}
+            provinceId={job.province_id}
+            jobType={job.job_type}
+          />
         </div>
       </div>
 
