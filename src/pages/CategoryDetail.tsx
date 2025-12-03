@@ -388,8 +388,16 @@ const CategoryDetail = () => {
                 </div>
               ) : jobs && jobs.length > 0 ? (
                 <div className="space-y-4">
-                  {jobs.map((job) => (
-                    <JobCard key={job.id} job={job} />
+                  {jobs.map((job, index) => (
+                    <>
+                      <JobCard key={job.id} job={job} />
+                      {/* Mobile ad after every 3 jobs */}
+                      {(index + 1) % 3 === 0 && index !== (jobs?.length ?? 0) - 1 && (
+                        <div className="lg:hidden" key={`mobile-ad-${index}`}>
+                          <AdPlacement type="in_article" />
+                        </div>
+                      )}
+                    </>
                   ))}
                 </div>
               ) : (
