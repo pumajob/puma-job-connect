@@ -248,7 +248,7 @@ const JobDetail = () => {
               )}
 
               {/* Ad after Requirements */}
-              {job.requirements && <AdPlacement type="horizontal_banner" lazy />}
+              {job.requirements && <AdPlacement type="horizontal_banner" />}
 
               {/* Responsibilities Card */}
               {job.responsibilities && (
@@ -263,7 +263,7 @@ const JobDetail = () => {
               )}
 
               {/* Ad after Responsibilities */}
-              {job.responsibilities && <AdPlacement type="horizontal_banner" lazy />}
+              {job.responsibilities && <AdPlacement type="horizontal_banner" />}
             </div>
 
             {/* Sidebar */}
@@ -388,7 +388,7 @@ const JobDetail = () => {
 
         {/* Final Ad after Related Jobs */}
         <div className="container mx-auto px-4 pb-12">
-          <AdPlacement type="horizontal_banner" lazy />
+          <AdPlacement type="horizontal_banner" />
         </div>
       </div>
 
