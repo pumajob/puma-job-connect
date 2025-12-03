@@ -184,6 +184,7 @@ const JobDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Job Header Card */}
               <Card>
                 <CardContent className="p-8">
                   <div className="flex items-start gap-4 mb-6">
@@ -209,7 +210,7 @@ const JobDetail = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-2">
                     {job.category && (
                       <Badge variant="secondary">{job.category.name}</Badge>
                     )}
@@ -218,33 +219,51 @@ const JobDetail = () => {
                       {job.job_type.replace("_", " ")}
                     </Badge>
                   </div>
-
-                  <div className="prose max-w-none mb-8">
-                    <h2 className="text-xl font-semibold mb-3">Description</h2>
-                    <p className="whitespace-pre-wrap text-muted-foreground">
-                      {job.description}
-                    </p>
-                  </div>
-
-                  {job.requirements && (
-                    <div className="prose max-w-none mb-8">
-                      <h2 className="text-xl font-semibold mb-3">Requirements</h2>
-                      <p className="whitespace-pre-wrap text-muted-foreground">
-                        {job.requirements}
-                      </p>
-                    </div>
-                  )}
-
-                  {job.responsibilities && (
-                    <div className="prose max-w-none">
-                      <h2 className="text-xl font-semibold mb-3">Responsibilities</h2>
-                      <p className="whitespace-pre-wrap text-muted-foreground">
-                        {job.responsibilities}
-                      </p>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
+
+              {/* Description Card */}
+              <Card>
+                <CardContent className="p-8">
+                  <h2 className="text-xl font-semibold mb-3">Description</h2>
+                  <p className="whitespace-pre-wrap text-muted-foreground">
+                    {job.description}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Ad after Description */}
+              <AdPlacement type="horizontal_banner" />
+
+              {/* Requirements Card */}
+              {job.requirements && (
+                <Card>
+                  <CardContent className="p-8">
+                    <h2 className="text-xl font-semibold mb-3">Requirements</h2>
+                    <p className="whitespace-pre-wrap text-muted-foreground">
+                      {job.requirements}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Ad after Requirements */}
+              {job.requirements && <AdPlacement type="horizontal_banner" lazy />}
+
+              {/* Responsibilities Card */}
+              {job.responsibilities && (
+                <Card>
+                  <CardContent className="p-8">
+                    <h2 className="text-xl font-semibold mb-3">Responsibilities</h2>
+                    <p className="whitespace-pre-wrap text-muted-foreground">
+                      {job.responsibilities}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Ad after Responsibilities */}
+              {job.responsibilities && <AdPlacement type="horizontal_banner" lazy />}
             </div>
 
             {/* Sidebar */}
@@ -355,13 +374,6 @@ const JobDetail = () => {
               </Card>
             </div>
           </div>
-        </div>
-
-        {/* Ad Placements - Outside grid for full width */}
-        <div className="container mx-auto px-4">
-          <AdPlacement type="horizontal_banner" />
-          <AdPlacement type="horizontal_banner" lazy />
-          <AdPlacement type="horizontal_banner" lazy />
         </div>
 
         {/* Related Jobs Section */}
