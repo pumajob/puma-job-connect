@@ -569,6 +569,12 @@ export const InterviewHelper = () => {
                 <h4 className="font-semibold mb-2">Feedback:</h4>
                 <p className="text-muted-foreground">{currentResult.feedback}</p>
               </div>
+
+              {/* In-article ad between feedback and suggested answer */}
+              {showAd && (
+                <AdPlacement type="in_article" className="my-2" />
+              )}
+
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4" />
