@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, CheckCircle, XCircle, Lightbulb, Mail, ArrowRight, Eye, Play, X } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Lightbulb, Mail, ArrowRight, Eye } from 'lucide-react';
 import { AdPlacement } from '@/components/AdPlacement';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useAdFrequency } from '@/hooks/useAdFrequency';
 
 interface Question {
   question: string;
@@ -26,7 +26,9 @@ interface Evaluation {
 
 export const InterviewHelper = () => {
   const { toast } = useToast();
-  const [step, setStep] = useState<'email' | 'setup' | 'ad-before-question' | 'answering' | 'ad-before-results' | 'results'>('email');
+  const { canShowAd, recordImpression, getRemainingLimits, cooldownRemaining } = useAdFrequency();
+  
+  const [step, setStep] = useState<'email' | 'setup' | 'loading-content' | 'answering' | 'loading-results' | 'results'>('email');
   const [email, setEmail] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState('');
@@ -39,66 +41,42 @@ export const InterviewHelper = () => {
   const [loading, setLoading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [currentResultIndex, setCurrentResultIndex] = useState(0);
-  const [adCountdown, setAdCountdown] = useState(5);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [canProceed, setCanProceed] = useState(false);
-  const [showRewardedAd, setShowRewardedAd] = useState(false);
-  const [rewardedAdCountdown, setRewardedAdCountdown] = useState(3);
-  const [rewardedAdComplete, setRewardedAdComplete] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to top and reset ad state when showing ad pages
+  // Handle loading screens with ad frequency management
   useEffect(() => {
-    if (step === 'ad-before-question' || step === 'ad-before-results') {
+    if (step === 'loading-content' || step === 'loading-results') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setAdCountdown(5);
+      setLoadingProgress(0);
       setCanProceed(false);
-      setRewardedAdComplete(false);
+
+      const showingAd = canShowAd();
       
+      // Minimum loading time based on whether we show an ad
+      const minTime = showingAd ? 4000 : 1500; // 4s with ad, 1.5s without
+      const interval = 100;
+      let elapsed = 0;
+
+      if (showingAd) {
+        recordImpression();
+      }
+
       const timer = setInterval(() => {
-        setAdCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setCanProceed(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+        elapsed += interval;
+        const progress = Math.min((elapsed / minTime) * 100, 100);
+        setLoadingProgress(progress);
+        
+        if (elapsed >= minTime) {
+          clearInterval(timer);
+          setCanProceed(true);
+        }
+      }, interval);
 
       return () => clearInterval(timer);
     }
-  }, [step, currentQuestionIndex, currentResultIndex]);
-
-  // Rewarded ad countdown
-  useEffect(() => {
-    if (showRewardedAd) {
-      setRewardedAdCountdown(3);
-      setRewardedAdComplete(false);
-      
-      const timer = setInterval(() => {
-        setRewardedAdCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            setRewardedAdComplete(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [showRewardedAd]);
-
-  const handleWatchRewardedAd = () => {
-    setShowRewardedAd(true);
-  };
-
-  const handleClaimReward = () => {
-    setShowRewardedAd(false);
-    setCanProceed(true);
-    setAdCountdown(0);
-  };
+  }, [step, currentQuestionIndex, currentResultIndex, canShowAd, recordImpression]);
 
   const handleEmailSubmit = () => {
     if (!email || !email.includes('@')) {
@@ -155,7 +133,7 @@ export const InterviewHelper = () => {
       setAnswers([]);
       setCurrentQuestionIndex(0);
       setCurrentAnswer('');
-      setStep('ad-before-question');
+      setStep('loading-content');
       
       toast({
         title: 'Success',
@@ -197,7 +175,7 @@ export const InterviewHelper = () => {
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setStep('ad-before-question');
+      setStep('loading-content');
     } else {
       handleSubmitForEvaluation(newAnswers);
     }
@@ -236,7 +214,7 @@ export const InterviewHelper = () => {
           .eq('id', sessionId);
       }
 
-      setStep('ad-before-results');
+      setStep('loading-results');
       
       setSendingEmail(true);
       try {
@@ -283,7 +261,7 @@ export const InterviewHelper = () => {
   const handleNextResult = () => {
     if (currentResultIndex < evaluation.length - 1) {
       setCurrentResultIndex(currentResultIndex + 1);
-      setStep('ad-before-results');
+      setStep('loading-results');
     }
   };
 
@@ -308,6 +286,8 @@ export const InterviewHelper = () => {
   };
 
   const currentResult = evaluation[currentResultIndex];
+  const limits = getRemainingLimits();
+  const showAd = canShowAd() || cooldownRemaining === 0;
 
   return (
     <div ref={containerRef} className="space-y-6">
@@ -396,54 +376,38 @@ export const InterviewHelper = () => {
         </Card>
       )}
 
-      {step === 'ad-before-question' && (
+      {step === 'loading-content' && (
         <div className="space-y-6">
           <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Eye className="w-8 h-8 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Get Ready for Question {currentQuestionIndex + 1}</CardTitle>
+              <CardTitle className="text-2xl">Preparing Question {currentQuestionIndex + 1}</CardTitle>
               <CardDescription className="text-base">
                 Take a moment to prepare yourself for the next interview question
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Ad placement - forced view */}
-              <div className="bg-muted/30 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
-                <AdPlacement type="display" className="my-0" />
-              </div>
-              
-              <AdPlacement type="in_article" className="my-0" />
+              {/* Only show ads if within limits */}
+              {showAd && (
+                <div className="bg-muted/30 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
+                  <AdPlacement type="display" className="my-0" />
+                </div>
+              )}
 
               <div className="text-center space-y-4">
                 {!canProceed ? (
                   <div className="space-y-4">
                     <p className="text-muted-foreground">
-                      Your question will be ready in <span className="font-bold text-primary text-xl">{adCountdown}</span> seconds
+                      Loading your question...
                     </p>
                     <div className="w-full bg-muted rounded-full h-2">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-1000"
-                        style={{ width: `${((5 - adCountdown) / 5) * 100}%` }}
+                        className="bg-primary h-2 rounded-full transition-all duration-100"
+                        style={{ width: `${loadingProgress}%` }}
                       />
-                    </div>
-                    
-                    {/* Skip timer option */}
-                    <div className="pt-2 border-t border-border/50">
-                      <Button 
-                        onClick={handleWatchRewardedAd} 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-2"
-                      >
-                        <Play className="h-4 w-4" />
-                        Skip Timer - Watch Short Ad
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Watch a 3-second ad to skip the timer
-                      </p>
                     </div>
                   </div>
                 ) : (
@@ -498,7 +462,7 @@ export const InterviewHelper = () => {
         </Card>
       )}
 
-      {step === 'ad-before-results' && (
+      {step === 'loading-results' && (
         <div className="space-y-6">
           <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
             <CardHeader className="text-center">
@@ -510,7 +474,7 @@ export const InterviewHelper = () => {
                 )}
               </div>
               <CardTitle className="text-2xl">
-                {currentResultIndex === 0 ? 'Your Results Are Ready!' : `Result ${currentResultIndex + 1} of ${evaluation.length}`}
+                {currentResultIndex === 0 ? 'Your Results Are Ready!' : `Preparing Result ${currentResultIndex + 1}`}
               </CardTitle>
               <CardDescription className="text-base">
                 {currentResultIndex === 0 
@@ -525,41 +489,25 @@ export const InterviewHelper = () => {
               )}
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Ad placement - forced view */}
-              <div className="bg-muted/30 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
-                <AdPlacement type="display" className="my-0" />
-              </div>
-              
-              <AdPlacement type="in_article" className="my-0" />
+              {/* Only show ads if within limits */}
+              {showAd && (
+                <div className="bg-muted/30 rounded-lg p-4">
+                  <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
+                  <AdPlacement type="display" className="my-0" />
+                </div>
+              )}
 
               <div className="text-center space-y-4">
                 {!canProceed ? (
                   <div className="space-y-4">
                     <p className="text-muted-foreground">
-                      Your feedback will be ready in <span className="font-bold text-primary text-xl">{adCountdown}</span> seconds
+                      Loading your feedback...
                     </p>
                     <div className="w-full bg-muted rounded-full h-2">
                       <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-1000"
-                        style={{ width: `${((5 - adCountdown) / 5) * 100}%` }}
+                        className="bg-primary h-2 rounded-full transition-all duration-100"
+                        style={{ width: `${loadingProgress}%` }}
                       />
-                    </div>
-                    
-                    {/* Skip timer option */}
-                    <div className="pt-2 border-t border-border/50">
-                      <Button 
-                        onClick={handleWatchRewardedAd} 
-                        variant="outline" 
-                        size="sm"
-                        className="gap-2"
-                      >
-                        <Play className="h-4 w-4" />
-                        Skip Timer - Watch Short Ad
-                      </Button>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Watch a 3-second ad to skip the timer
-                      </p>
                     </div>
                   </div>
                 ) : (
@@ -657,45 +605,6 @@ export const InterviewHelper = () => {
           </div>
         </div>
       )}
-
-      {/* Rewarded Ad Modal */}
-      <Dialog open={showRewardedAd} onOpenChange={setShowRewardedAd}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Play className="h-5 w-5 text-primary" />
-              Watch Ad to Skip Timer
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="bg-muted/30 rounded-lg p-4 min-h-[300px]">
-              <p className="text-sm text-muted-foreground text-center mb-4">Sponsored Content</p>
-              <AdPlacement type="display" className="my-0" />
-            </div>
-            
-            <div className="text-center">
-              {!rewardedAdComplete ? (
-                <div className="space-y-3">
-                  <p className="text-muted-foreground">
-                    Please wait <span className="font-bold text-primary text-xl">{rewardedAdCountdown}</span> seconds
-                  </p>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-1000"
-                      style={{ width: `${((3 - rewardedAdCountdown) / 3) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <Button onClick={handleClaimReward} size="lg" className="w-full">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Continue to Content
-                </Button>
-              )}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
