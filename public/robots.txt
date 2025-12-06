@@ -1,8 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap location (dynamic sitemap from edge function)
-Sitemap: https://iqiemxfuuawcvrwanisc.supabase.co/functions/v1/sitemap
+# Sitemap location
+Sitemap: https://pumajob.co.za/sitemap.xml
 
 # Allow specific important pages
 Allow: /jobs

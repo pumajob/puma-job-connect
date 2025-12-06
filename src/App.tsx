@@ -31,6 +31,7 @@ import ReferralDashboard from "./pages/ReferralDashboard";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import NotFound from "./pages/NotFound";
+import Sitemap from "./pages/Sitemap";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App: React.FC = () => {
             <Route path="/news" element={<News />} />
             <Route path="/news/:slug" element={<NewsDetail />} />
             <Route path="/unsubscribe" element={<Unsubscribe />} />
+            <Route path="/sitemap.xml" element={<Sitemap />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/jobs/new" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
