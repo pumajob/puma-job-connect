@@ -1,8 +1,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://pumajob.co.za/sitemap.xml
+# Sitemap location (raw XML for search engines)
+Sitemap: https://iqiemxfuuawcvrwanisc.supabase.co/functions/v1/sitemap
 
 # Allow specific important pages
 Allow: /jobs
