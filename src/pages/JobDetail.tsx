@@ -6,7 +6,7 @@ import { AdPlacement } from "@/components/AdPlacement";
 import { RelatedJobs } from "@/components/RelatedJobs";
 import { JobAlertSubscription } from "@/components/JobAlertSubscription";
 import { SEOHead } from "@/components/seo/SEOHead";
-import { JobStructuredData } from "@/components/seo/StructuredData";
+import { JobStructuredData, BreadcrumbStructuredData } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -172,6 +172,11 @@ const JobDetail = () => {
         section="Jobs"
       />
       <JobStructuredData job={job} url={currentUrl} />
+      <BreadcrumbStructuredData items={[
+        { name: "Home", url: "https://pumajob.co.za" },
+        { name: "Jobs", url: "https://pumajob.co.za/jobs" },
+        { name: job.title, url: currentUrl }
+      ]} />
       <Navbar />
 
       {/* Mobile Ad Placement - Top of Job Details */}
