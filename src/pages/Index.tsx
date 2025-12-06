@@ -11,7 +11,7 @@ import { AdPlacement } from "@/components/AdPlacement";
 import { InFeedAd } from "@/components/InFeedAd";
 import { TrendingJobs } from "@/components/TrendingJobs";
 import { SEOHead } from "@/components/seo/SEOHead";
-import { WebsiteStructuredData } from "@/components/seo/StructuredData";
+import { WebsiteStructuredData, OrganizationStructuredData } from "@/components/seo/StructuredData";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -76,10 +76,11 @@ const Index = () => {
         canonicalUrl={window.location.origin}
       />
       <WebsiteStructuredData 
-        name="South Africa Jobs"
+        name="PumaJob - South Africa Jobs"
         description="Find your dream job in South Africa - Browse thousands of opportunities across all provinces"
-        url={window.location.origin}
+        url="https://pumajob.co.za"
       />
+      <OrganizationStructuredData />
       <Navbar />
       
       {/* Hero Section */}

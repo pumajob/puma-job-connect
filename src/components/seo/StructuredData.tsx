@@ -23,6 +23,13 @@ export const JobStructuredData = ({ job, url }: JobStructuredDataProps) => {
   useEffect(() => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
+    script.id = "job-structured-data";
+    
+    // Remove existing script if present
+    const existingScript = document.getElementById("job-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
     
     // Map job_type to Google Jobs employmentType format
     const employmentTypeMap: Record<string, string> = {
@@ -33,7 +40,7 @@ export const JobStructuredData = ({ job, url }: JobStructuredDataProps) => {
       "temporary": "TEMPORARY"
     };
 
-    // Build full description
+    // Build full description (HTML stripped for structured data)
     let fullDescription = job.description;
     if (job.requirements) {
       fullDescription += `\n\nRequirements:\n${job.requirements}`;
@@ -42,70 +49,102 @@ export const JobStructuredData = ({ job, url }: JobStructuredDataProps) => {
       fullDescription += `\n\nResponsibilities:\n${job.responsibilities}`;
     }
 
-    const structuredData: any = {
+    // Parse salary range if available (e.g., "R15,000 - R25,000" or "R50,000")
+    const parseSalary = (salaryRange: string) => {
+      const numbers = salaryRange.match(/[\d,]+/g);
+      if (!numbers) return null;
+      
+      const cleanNumbers = numbers.map(n => parseInt(n.replace(/,/g, "")));
+      
+      if (cleanNumbers.length >= 2) {
+        return {
+          minValue: Math.min(...cleanNumbers),
+          maxValue: Math.max(...cleanNumbers)
+        };
+      } else if (cleanNumbers.length === 1) {
+        return { value: cleanNumbers[0] };
+      }
+      return null;
+    };
+
+    // Calculate valid through date (use deadline or 60 days from posting)
+    const getValidThrough = () => {
+      if (job.application_deadline) {
+        return new Date(job.application_deadline).toISOString();
+      }
+      const defaultExpiry = new Date(job.created_at);
+      defaultExpiry.setDate(defaultExpiry.getDate() + 60);
+      return defaultExpiry.toISOString();
+    };
+
+    const structuredData: Record<string, unknown> = {
       "@context": "https://schema.org/",
       "@type": "JobPosting",
       "title": job.title,
       "description": fullDescription,
       "identifier": {
         "@type": "PropertyValue",
-        "name": "South Africa Jobs",
+        "name": "PumaJob",
         "value": job.id
       },
-      "datePosted": job.created_at.split('T')[0], // ISO 8601 date format
-      "validThrough": job.application_deadline 
-        ? new Date(job.application_deadline).toISOString()
-        : undefined,
+      "datePosted": job.created_at.split('T')[0],
+      "validThrough": getValidThrough(),
       "employmentType": employmentTypeMap[job.job_type] || "FULL_TIME",
       "hiringOrganization": {
         "@type": "Organization",
         "name": job.company_name,
-        "sameAs": url,
-        "logo": job.company_logo || undefined
+        "sameAs": `https://pumajob.co.za/companies/${encodeURIComponent(job.company_name)}`,
+        ...(job.company_logo && { "logo": job.company_logo })
       },
       "jobLocation": {
         "@type": "Place",
         "address": {
           "@type": "PostalAddress",
-          "streetAddress": job.location,
           "addressLocality": job.location,
           "addressRegion": job.province?.name || "South Africa",
           "addressCountry": "ZA"
         }
       },
-      "applicantLocationRequirements": {
-        "@type": "Country",
-        "name": "ZA"
-      },
-      "jobLocationType": "TELECOMMUTE",
-      "url": url
+      "directApply": true
     };
 
     // Add salary information if available
     if (job.salary_range) {
-      structuredData.baseSalary = {
-        "@type": "MonetaryAmount",
-        "currency": "ZAR",
-        "value": {
-          "@type": "QuantitativeValue",
-          "value": job.salary_range,
-          "unitText": "YEAR"
+      const salary = parseSalary(job.salary_range);
+      if (salary) {
+        if ("value" in salary) {
+          structuredData.baseSalary = {
+            "@type": "MonetaryAmount",
+            "currency": "ZAR",
+            "value": {
+              "@type": "QuantitativeValue",
+              "value": salary.value,
+              "unitText": "MONTH"
+            }
+          };
+        } else {
+          structuredData.baseSalary = {
+            "@type": "MonetaryAmount",
+            "currency": "ZAR",
+            "value": {
+              "@type": "QuantitativeValue",
+              "minValue": salary.minValue,
+              "maxValue": salary.maxValue,
+              "unitText": "MONTH"
+            }
+          };
         }
-      };
-    }
-
-    // Remove undefined fields
-    Object.keys(structuredData).forEach(key => {
-      if (structuredData[key] === undefined) {
-        delete structuredData[key];
       }
-    });
+    }
 
     script.text = JSON.stringify(structuredData);
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      const scriptToRemove = document.getElementById("job-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
     };
   }, [job, url]);
 
@@ -122,6 +161,12 @@ export const WebsiteStructuredData = ({ name, description, url }: WebsiteStructu
   useEffect(() => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
+    script.id = "website-structured-data";
+    
+    const existingScript = document.getElementById("website-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
     
     const structuredData = {
       "@context": "https://schema.org",
@@ -143,7 +188,10 @@ export const WebsiteStructuredData = ({ name, description, url }: WebsiteStructu
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      const scriptToRemove = document.getElementById("website-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
     };
   }, [name, description, url]);
 
@@ -166,6 +214,12 @@ export const ArticleStructuredData = ({ article, url }: ArticleStructuredDataPro
   useEffect(() => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
+    script.id = "article-structured-data";
+    
+    const existingScript = document.getElementById("article-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
     
     const structuredData = {
       "@context": "https://schema.org",
@@ -177,22 +231,22 @@ export const ArticleStructuredData = ({ article, url }: ArticleStructuredDataPro
       "dateModified": article.published_at,
       "author": {
         "@type": "Organization",
-        "name": "South Africa Jobs",
-        "url": window.location.origin
+        "name": "PumaJob",
+        "url": "https://pumajob.co.za"
       },
       "publisher": {
         "@type": "Organization",
-        "name": "South Africa Jobs",
+        "name": "PumaJob",
         "logo": {
           "@type": "ImageObject",
-          "url": `${window.location.origin}/favicon.ico`
+          "url": "https://pumajob.co.za/favicon.ico"
         }
       },
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": url
       },
-      "articleSection": "News",
+      "articleSection": "Career News",
       "inLanguage": "en-ZA"
     };
 
@@ -200,9 +254,153 @@ export const ArticleStructuredData = ({ article, url }: ArticleStructuredDataPro
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      const scriptToRemove = document.getElementById("article-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
     };
   }, [article, url]);
+
+  return null;
+};
+
+// Organization structured data for homepage
+export const OrganizationStructuredData = () => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "organization-structured-data";
+    
+    const existingScript = document.getElementById("organization-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "PumaJob",
+      "alternateName": "PumaJob South Africa",
+      "url": "https://pumajob.co.za",
+      "logo": "https://pumajob.co.za/favicon.ico",
+      "description": "South Africa's leading job board connecting job seekers with top employers across all provinces.",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "Country",
+        "name": "South Africa"
+      },
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": ["English", "Afrikaans"]
+      }
+    };
+
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById("organization-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, []);
+
+  return null;
+};
+
+// Breadcrumb structured data
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+interface BreadcrumbStructuredDataProps {
+  items: BreadcrumbItem[];
+}
+
+export const BreadcrumbStructuredData = ({ items }: BreadcrumbStructuredDataProps) => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "breadcrumb-structured-data";
+    
+    const existingScript = document.getElementById("breadcrumb-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": items.map((item, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item.name,
+        "item": item.url
+      }))
+    };
+
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById("breadcrumb-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [items]);
+
+  return null;
+};
+
+// FAQ structured data
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface FAQStructuredDataProps {
+  faqs: FAQItem[];
+}
+
+export const FAQStructuredData = ({ faqs }: FAQStructuredDataProps) => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.id = "faq-structured-data";
+    
+    const existingScript = document.getElementById("faq-structured-data");
+    if (existingScript) {
+      existingScript.remove();
+    }
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    };
+
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const scriptToRemove = document.getElementById("faq-structured-data");
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, [faqs]);
 
   return null;
 };
